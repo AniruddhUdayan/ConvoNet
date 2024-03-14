@@ -1,5 +1,5 @@
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "./../globals.css";
 import { CssBaseline } from "@mui/material";
 
 
@@ -11,11 +11,14 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        <CssBaseline />
-        {children}
+          {" "}
+          <CssBaseline />
+          {children}
       </body>
     </html>
   );
