@@ -1,4 +1,5 @@
 import { styled } from "@mui/material";
+import Link from "next/link";
 
 export const VisuallyHiddenInput = styled("input")({
     border: 0,
@@ -11,3 +12,13 @@ export const VisuallyHiddenInput = styled("input")({
     width: 1,
     whiteSpace: "nowrap",
     });
+
+
+export const LinkComponent = styled(Link)`
+text-decoration: none;
+color:black;
+padding:1rem;
+&:hover{
+    background-color:#f0f0f0;
+}
+`;
