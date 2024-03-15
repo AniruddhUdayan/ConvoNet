@@ -1,6 +1,7 @@
 import React from 'react'
 
-const Chat = () => {
+const Chat = ({params}) => {
+  // console.log(params);
   return (
     <div>
       Chat
