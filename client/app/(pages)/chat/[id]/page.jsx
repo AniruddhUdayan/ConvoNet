@@ -6,6 +6,7 @@ import { AttachFile, Send } from "@mui/icons-material";
 import { InputBox } from "@/components/styles/StyledComponents";
 import { sampleMessages } from "@/constants/sampleData";
 import MessageComponent from "@/components/shared/MessageComponent";
+import FileMenu from "@/components/dialogs/FileMenu";
 
 const user = {
   _id:"asdasdad",
@@ -53,6 +54,7 @@ const Chat = ({ params }) => {
           </IconButton>
         </Stack>
       </form>
+      <FileMenu />
     </>
   );
 };

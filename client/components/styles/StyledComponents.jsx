@@ -30,5 +30,6 @@ height: 100%;
 border: none;
 outline: none;
 padding:0.3rem;
+padding-left: 3rem;
 border-radius:1.5rem;
 background-color:${grayColor};`
