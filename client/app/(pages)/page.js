@@ -1,3 +1,5 @@
+import { grayColor } from "@/constants/color";
+import { Typography , Box } from "@mui/material";
 import Head from "next/head";
 import Image from "next/image";
 
@@ -8,11 +10,11 @@ export const metadata = {
 
 export default function Home() {
   return (
-    <>
-      <div>
-      <h1>Home</h1>
-     
-    </div>
-    </>
+    <Box bgcolor={grayColor} height={"100%"}>
+      {" "}
+      <Typography p={"2rem"} variant="h5" textAlign={"center"}>
+        Select a friend to chat
+      </Typography>
+    </Box>
   );
 }
