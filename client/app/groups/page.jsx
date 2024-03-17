@@ -1,9 +1,18 @@
 "use client";
+import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
+import AddMemberDialog from "@/components/dialogs/AddMemberDialog";
 import AvatarCard from "@/components/shared/AvatarCard";
 import { LinkComponent } from "@/components/styles/StyledComponents";
 import { mattBlack, orange } from "@/constants/color";
 import { sampleChats } from "@/constants/sampleData";
-import { KeyboardBackspace, Menu } from "@mui/icons-material";
+import {
+  Add,
+  Delete,
+  Done,
+  Edit,
+  KeyboardBackspace,
+  Menu,
+} from "@mui/icons-material";
 import {
   Box,
   Drawer,
@@ -12,13 +21,24 @@ import {
   Tooltip,
   Stack,
   Typography,
+  TextField,
+  Button,
+  Backdrop,
 } from "@mui/material";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { memo } from "react";
+
+const isAddMember = false;
 
 const page = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [groupName, setGroupName] = useState("");
+  const [groupNameUpdatedValue, setGroupNameUpdatedValue] = useState("");
+
+  
 
   const handleMobile = () => {
     setIsMobileMenuOpen((prev) => !prev);
@@ -26,6 +46,29 @@ const page = () => {
   const handleMobileclose = () => {
     setIsMobileMenuOpen(false);
   };
+  const updateGroupName = () => {
+    setIsEdit(false);
+  };
+  const openAddMemberHandler = () => {};
+  const openConfirmDeleteHandler = () => {
+    setConfirmDeleteDialog(true);
+  };
+  const closeConfirmDeleteHandler = () => {
+    setConfirmDeleteDialog(false);
+  };
+  const deleteHandler = () => {
+    closeConfirmDeleteHandler();
+  };
+  useEffect(() => {
+    setGroupName(`Group Name `); //here add chat id
+    setGroupNameUpdatedValue(`Group Name `); //here add chat id
+
+    return () => {
+      setGroupName("");
+      setGroupNameUpdatedValue("");
+      setIsEdit(false);
+    };
+  }, []); //need to add chatId in dependency array as well
 
   const IconBtns = (
     <>
@@ -68,6 +111,67 @@ const page = () => {
     </>
   );
 
+  const GroupName = (
+    <Stack
+      direction={"row"}
+      alignItems={"center"}
+      justifyContent={"center"}
+      spacing={"1rem"}
+      padding={"3rem"}
+    >
+      {isEdit ? (
+        <>
+          <TextField
+            value={groupNameUpdatedValue}
+            onChange={(e) => setGroupNameUpdatedValue(e.target.value)}
+          />
+          <IconButton onClick={updateGroupName}>
+            <Done />
+          </IconButton>
+        </>
+      ) : (
+        <>
+          <Typography variant={"h4"}>{groupName}</Typography>
+          <IconButton onClick={() => setIsEdit(true)}>
+            <Edit />
+          </IconButton>
+        </>
+      )}
+    </Stack>
+  );
+
+  const ButtonGroup = (
+    <Stack
+      direction={{
+        xs: "column-reverse",
+        sm: "row",
+      }}
+      spacing={"1rem"}
+      p={{
+        xs: "0",
+        sm: "1rem",
+        md: "1rem 4rem",
+      }}
+    >
+      <Button
+        size="large"
+        color="error"
+        startIcon={<Delete />}
+        onClick={openConfirmDeleteHandler}
+      >
+        Delete Group
+      </Button>
+      <Button
+        size="large"
+        variant="contained"
+        startIcon={<Add />}
+        onClick={openAddMemberHandler}
+      >
+        Add Member
+      </Button>
+    </Stack>
+  );
+
   return (
     <Grid container height={"100vh"}>
       <Grid
@@ -81,7 +185,7 @@ const page = () => {
         sm={4}
         bgcolor={"bisque"}
       >
-        <GroupsList w={"50vw"} myGroups={sampleChats} chatId={chatId}/>
+        <GroupsList w={"50vw"} myGroups={sampleChats} />
       </Grid>
       <Grid
         item
@@ -96,7 +200,48 @@ const page = () => {
         }}
       >
         {IconBtns}
+        {groupName && (
+          <>
+            {GroupName}
+            <Typography
+              margin={"2rem"}
+              alignSelf={"flex-start"}
+              variant="body1"
+            >
+              Members
+            </Typography>
+            <Stack
+              maxWidth={"45rem"}
+              width={"100%"}
+              boxSizing={"border-box"}
+              padding={{
+                sm: "1rem",
+                xs: "0",
+                md: "1rem 4rem",
+              }}
+              spacing={"2rem"}
+              bgcolor={"bisque"}
+              height={"50vh"}
+              overflow={"auto"}
+            ></Stack>
+            {ButtonGroup}
+          </>
+        )}
       </Grid>
+      {isAddMember && (
+        <Suspense fallback={<Backdrop open />}>
+          <AddMemberDialog/>
+        </Suspense>
+      )}
+      {confirmDeleteDialog && (
+        <Suspense fallback={<Backdrop open />}>
+          <ConfirmDeleteDialog
+            open={confirmDeleteDialog}
+            handleClose={closeConfirmDeleteHandler}
+            deleteHandler={deleteHandler}
+          />
+        </Suspense>
+      )}
       <Drawer
         sx={{
           display: {
@@ -108,7 +253,7 @@ const page = () => {
         onClose={handleMobileclose}
       >
         {" "}
-        <GroupsList />
+        <GroupsList w={"50vw"} myGroups={sampleChats} />
       </Drawer>
     </Grid>
   );
@@ -132,11 +277,14 @@ const GroupListItem = memo(({ group, chatId }) => {
   const { name, avatar, _id } = group;
 
   return (
-    <LinkComponent href={`?group=${_id}`} onClick={(e) => {
-      if (chatId === _id) {
-        e.preventDefault();
-      }
-    }}>
+    <LinkComponent
+      href={`?group=${_id}`}
+      onClick={(e) => {
+        if (chatId === _id) {
+          e.preventDefault();
+        }
+      }}
+    >
       <Stack direction={"row"} spacing={"1rem"} alignItems={"center"}>
         <AvatarCard avatar={avatar}>
           <Typography>{name}</Typography>
