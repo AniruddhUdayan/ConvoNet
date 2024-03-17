@@ -3,8 +3,8 @@ import ConfirmDeleteDialog from "@/components/dialogs/ConfirmDeleteDialog";
 import AddMemberDialog from "@/components/dialogs/AddMemberDialog";
 import AvatarCard from "@/components/shared/AvatarCard";
 import { LinkComponent } from "@/components/styles/StyledComponents";
-import { mattBlack, orange } from "@/constants/color";
-import { sampleChats } from "@/constants/sampleData";
+import { bgGradient, mattBlack, orange } from "@/constants/color";
+import { sampleChats, sampleUsers } from "@/constants/sampleData";
 import {
   Add,
   Delete,
@@ -28,6 +28,7 @@ import {
 import Link from "next/link";
 import React, { Suspense, useEffect, useState } from "react";
 import { memo } from "react";
+import UserItem from "@/components/shared/UserItem";
 
 const isAddMember = false;
 
@@ -59,6 +60,7 @@ const page = () => {
   const deleteHandler = () => {
     closeConfirmDeleteHandler();
   };
+  const removeMemberHandler = (id)  => {};
   useEffect(() => {
     setGroupName(`Group Name `); //here add chat id
     setGroupNameUpdatedValue(`Group Name `); //here add chat id
@@ -181,11 +183,12 @@ const page = () => {
             xs: "none",
             sm: "block",
           },
+          
         }}
         sm={4}
-        bgcolor={"bisque"}
+        
       >
-        <GroupsList w={"50vw"} myGroups={sampleChats} />
+        <GroupsList  myGroups={sampleChats} />
       </Grid>
       <Grid
         item
@@ -220,10 +223,19 @@ const page = () => {
                 md: "1rem 4rem",
               }}
               spacing={"2rem"}
-              bgcolor={"bisque"}
               height={"50vh"}
               overflow={"auto"}
-            ></Stack>
+            >
+              {sampleUsers.map((user) => (
+                <UserItem user={user} key={user._id} isAdded styling={{
+                  boxShadow: `0 0  0.5rem rgba(0,0,0,0.2)`,
+                  padding: "1rem 2rem",
+                  borderRadius: "1rem",
+                }}
+                  handler={removeMemberHandler}
+                />
+              ))}
+            </Stack>
             {ButtonGroup}
           </>
         )}
@@ -260,7 +272,10 @@ const page = () => {
 };
 
 const GroupsList = ({ w = "100%", myGroups = [], chatId }) => (
-  <Stack width={w}>
+  <Stack width={w} sx={{
+    backgroundImage: bgGradient,
+    height: "100vh",
+  }}>
     {myGroups.length > 0 ? (
       myGroups.map((group) => {
         <GroupListItem key={group._id} group={group} chatId={chatId} />;

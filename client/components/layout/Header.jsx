@@ -46,7 +46,7 @@ const Header = () => {
   return (
     <>
       <Box sx={{ flexGrow: 1 }} height={"4rem"}>
-        <AppBar position="static" sx={{ bgcolor: orange }}>
+        <AppBar position="static" sx={{ bgcolor: 'rgb(86,145,136)' }}>
           <Toolbar>
             <Typography
               variant="h6"
@@ -99,6 +99,7 @@ const Header = () => {
                         color: "white",
                       },
                       textDecoration: "none",
+                     marginTop: "0.5rem",
                     }}
                   >
                     <span style={{ textDecoration: "none" }}>
