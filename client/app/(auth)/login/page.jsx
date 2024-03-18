@@ -18,6 +18,7 @@ import { usernameValidator } from "@/utils/validators";
 
 const page = () => {
   const [isLogin, setIsLogin] = useState(true);
+  
 
   const toggleLogin = () => {
     setIsLogin(!isLogin);
