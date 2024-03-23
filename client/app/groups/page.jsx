@@ -62,15 +62,15 @@ const page = () => {
   };
   const removeMemberHandler = (id)  => {};
   useEffect(() => {
-    setGroupName(`Group Name `); //here add chat id
-    setGroupNameUpdatedValue(`Group Name `); //here add chat id
+    setGroupName(`Group Name `); 
+    setGroupNameUpdatedValue(`Group Name `);
 
     return () => {
       setGroupName("");
       setGroupNameUpdatedValue("");
       setIsEdit(false);
     };
-  }, []); //need to add chatId in dependency array as well
+  }, []); 
 
   const IconBtns = (
     <>
