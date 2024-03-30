@@ -34,8 +34,6 @@ const login = async (req, res, next) => {
 };
 
 const getMyProfile = async (req, res) => {
-  //req.user will give us user id with help of auth middleware
-  // console.log(req.user);
   const user = await User.findById(req.user);
   res.status(200).json({
     success: true,
