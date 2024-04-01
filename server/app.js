@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 
 import userRoute from './routes/user.js';
 import chatRoute from './routes/chat.js';
+import { createUsers } from './seeders/user.js';
 
 dotenv.config({
     path:'./.env'
@@ -15,6 +16,7 @@ const mongoURI = process.env.MONGO_URI;
 const port = process.env.PORT || 3000;
 
 connectDB(mongoURI);
+// createUsers(10);
 
 const app = express();
 
