@@ -1,4 +1,4 @@
-import { Schema, Types, model } from "mongoose";
+import mongoose, { Schema, Types, model } from "mongoose";
 
 const schema = new Schema(
   {
@@ -16,4 +16,4 @@ const schema = new Schema(
   { timestamps: true }
 ); // timestamps: true is used to add createdAt and updatedAt fields in the document
 
-export const Message = model.Message || model("Message", schema); // model.Message is for testing purposes
+export const Message = mongoose.models.Message || model("Message", schema); // model.Message is for testing purposes
