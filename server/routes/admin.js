@@ -1,14 +1,18 @@
 import express from 'express';
-import { getAllChats, getAllUsers, getAllMessages } from '../controllers/admin.js';
+import { getAllChats, getAllUsers, getAllMessages, getDashboardStats, adminLogin, adminLogout, getAdminData } from '../controllers/admin.js';
+import { adminLoginValidator, validate } from '../lib/validators.js';
+import { isAdmin } from '../middlewares/auth.js';
 
 const router = express.Router();
 
 
-router.get('/');
+router.post('/verify' , adminLoginValidator() , validate , adminLogin)
 
-router.post('/verify')
+router.get('/logout' , adminLogout)
 
-router.get('/logout')
+router.use(isAdmin)
+
+router.get('/' , getAdminData);
 
 router.get('/users' , getAllUsers)
 
@@ -16,6 +20,6 @@ router.get('/chats' , getAllChats)
 
 router.get('/messages' , getAllMessages)
 
-router.get('/stats')
+router.get('/stats' , getDashboardStats)
 
 export default router;
