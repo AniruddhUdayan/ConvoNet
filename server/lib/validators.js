@@ -1,4 +1,4 @@
-import { body, check, param, query, validationResult } from "express-validator";
+import { body, param, query, validationResult } from "express-validator";
 
 
 const validate = (req , res , next) => {
@@ -15,7 +15,6 @@ const registerValidator = () => [
   body("userName" , "Please Enter Username").notEmpty(),
   body("password" , "Please Enter Password").notEmpty(),
   body("bio", "Please Enter Bio").notEmpty(),
-  check("avatar").notEmpty().withMessage("Please Upload Avatar"),
 ];
 
 const loginValidator = () => [
@@ -44,7 +43,6 @@ const leaveGroupValidator = () => [
 
 const sendAttachmentsValidator = () => [
     body("chatId" , "Please Enter Chat ID").notEmpty(),
-    check("files").notEmpty().withMessage("Please Upload Attachments").isArray({min:1 , max:5}).withMessage("Attachments must be between 1-5")
 ];
 
 const getMessagesValidator = () => [
