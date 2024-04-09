@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import Loaders from "@/components/layout/Loaders";
 import { Provider } from "react-redux";
 import store from "@/redux/store";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +17,7 @@ export default function RootLayout({ children }) {
         <Provider store={store}>
           <Suspense fallback={<Loaders />}>
             <CssBaseline />
-            <div onContextMenu={(e) => e.preventDefault()}> {children}</div>
+            <div onContextMenu={(e) => e.preventDefault()}><Toaster position="bottom-center"/> {children}</div>
           </Suspense>
         </Provider>
       </body>

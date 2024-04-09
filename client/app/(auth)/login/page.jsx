@@ -10,22 +10,65 @@ import {
   Icon,
   IconButton,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CameraAlt } from "@mui/icons-material";
 import { VisuallyHiddenInput } from "@/components/styles/StyledComponents";
 import { useFileHandler, useInputValidation, useStrongPassword } from "6pp";
 import { usernameValidator } from "@/utils/validators";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { userNotExists , userExits } from "@/redux/reducers/auth";
+import {toast} from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const page = () => {
   const [isLogin, setIsLogin] = useState(true);
-  
+  const server = process.env.NEXT_PUBLIC_SERVER;
+
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  useEffect(() => {
+    axios
+      .get(`${server}/user/profile`)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        dispatch(userNotExists());
+      });
+  }, [dispatch]);
 
   const toggleLogin = () => {
     setIsLogin(!isLogin);
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+
+    const config = {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    await axios
+      .post(
+        `${server}/user/login`,
+        { userName: username.value, password: password.value },
+        config
+      )
+      .then((res) => {
+        console.log(res.data , 'reached');
+        dispatch(userExits(true));
+        toast.success(res?.data?.message)
+        router.push('/')
+        // window.location.href = "/";
+      })
+      .catch((err) => {
+       toast.error(err?.response?.data?.message || 'Something Went Wrong' )
+      });
   };
   const handleSignUp = (e) => {
     e.preventDefault();
@@ -38,9 +81,11 @@ const page = () => {
   const avatar = useFileHandler("single");
 
   return (
-    <div style={{
-      backgroundImage: "linear-gradient(rgb(255,255,209), rgb(86,145,136))"
-    }}>
+    <div
+      style={{
+        backgroundImage: "linear-gradient(rgb(255,255,209), rgb(86,145,136))",
+      }}
+    >
       {" "}
       <Container
         component={"main"}

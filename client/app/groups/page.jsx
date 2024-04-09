@@ -39,8 +39,6 @@ const page = () => {
   const [groupName, setGroupName] = useState("");
   const [groupNameUpdatedValue, setGroupNameUpdatedValue] = useState("");
 
-  
-
   const handleMobile = () => {
     setIsMobileMenuOpen((prev) => !prev);
   };
@@ -60,9 +58,9 @@ const page = () => {
   const deleteHandler = () => {
     closeConfirmDeleteHandler();
   };
-  const removeMemberHandler = (id)  => {};
+  const removeMemberHandler = (id) => {};
   useEffect(() => {
-    setGroupName(`Group Name `); 
+    setGroupName(`Group Name `);
     setGroupNameUpdatedValue(`Group Name `);
 
     return () => {
@@ -70,7 +68,7 @@ const page = () => {
       setGroupNameUpdatedValue("");
       setIsEdit(false);
     };
-  }, []); 
+  }, []);
 
   const IconBtns = (
     <>
@@ -91,24 +89,26 @@ const page = () => {
         </IconButton>
       </Box>
       <Tooltip title="back">
-        <Link href="/">
-          {" "}
-          <IconButton
-            sx={{
-              position: "absolute",
-              top: "2rem",
-              left: "2rem",
-              bgcolor: mattBlack,
-              color: "white",
-              ":&hover": {
-                bgcolor: "rgba(0,0,0,0.7)",
-                color: "black",
-              },
-            }}
-          >
-            <KeyboardBackspace />
-          </IconButton>
-        </Link>
+        <div>
+          <Link href="/">
+            {" "}
+            <IconButton
+              sx={{
+                position: "absolute",
+                top: "2rem",
+                left: "2rem",
+                bgcolor: mattBlack,
+                color: "white",
+                ":&hover": {
+                  bgcolor: "rgba(0,0,0,0.7)",
+                  color: "black",
+                },
+              }}
+            >
+              <KeyboardBackspace />
+            </IconButton>
+          </Link>
+        </div>
       </Tooltip>
     </>
   );
@@ -183,12 +183,10 @@ const page = () => {
             xs: "none",
             sm: "block",
           },
-          
         }}
         sm={4}
-        
       >
-        <GroupsList  myGroups={sampleChats} />
+        <GroupsList myGroups={sampleChats} />
       </Grid>
       <Grid
         item
@@ -227,11 +225,15 @@ const page = () => {
               overflow={"auto"}
             >
               {sampleUsers.map((user) => (
-                <UserItem user={user} key={user._id} isAdded styling={{
-                  boxShadow: `0 0  0.5rem rgba(0,0,0,0.2)`,
-                  padding: "1rem 2rem",
-                  borderRadius: "1rem",
-                }}
+                <UserItem
+                  user={user}
+                  key={user._id}
+                  isAdded
+                  styling={{
+                    boxShadow: `0 0  0.5rem rgba(0,0,0,0.2)`,
+                    padding: "1rem 2rem",
+                    borderRadius: "1rem",
+                  }}
                   handler={removeMemberHandler}
                 />
               ))}
@@ -242,7 +244,7 @@ const page = () => {
       </Grid>
       {isAddMember && (
         <Suspense fallback={<Backdrop open />}>
-          <AddMemberDialog/>
+          <AddMemberDialog />
         </Suspense>
       )}
       {confirmDeleteDialog && (
@@ -272,10 +274,13 @@ const page = () => {
 };
 
 const GroupsList = ({ w = "100%", myGroups = [], chatId }) => (
-  <Stack width={w} sx={{
-    backgroundImage: bgGradient,
-    height: "100vh",
-  }}>
+  <Stack
+    width={w}
+    sx={{
+      backgroundImage: bgGradient,
+      height: "100vh",
+    }}
+  >
     {myGroups.length > 0 ? (
       myGroups.map((group) => {
         <GroupListItem key={group._id} group={group} chatId={chatId} />;

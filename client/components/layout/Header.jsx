@@ -46,7 +46,7 @@ const Header = () => {
   return (
     <>
       <Box sx={{ flexGrow: 1 }} height={"4rem"}>
-        <AppBar position="static" sx={{ bgcolor: 'rgb(86,145,136)' }}>
+        <AppBar position="static" sx={{ bgcolor: "rgb(86,145,136)" }}>
           <Toolbar>
             <Typography
               variant="h6"
@@ -72,61 +72,68 @@ const Header = () => {
             />
             <Box>
               {" "}
-              <Tooltip title="Search">
+              <div>
                 {" "}
-                <IconButton
-                  color="inherit"
-                  size="large"
-                  onClick={onSearchDialog}
-                >
-                  <Search />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="New Group">
-                <IconButton color="inherit" size="large" onClick={openNewGroup}>
-                  <Add />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Manage Groups">
-                <Link href="/groups" passHref>
+                <Tooltip title="Search">
                   {" "}
                   <IconButton
                     color="inherit"
                     size="large"
-                    sx={{
-                      color: "white",
-                      "&:hover": {
-                        color: "white",
-                      },
-                      textDecoration: "none",
-                     marginTop: "0.5rem",
-                    }}
+                    onClick={onSearchDialog}
                   >
-                    <span style={{ textDecoration: "none" }}>
-                      {" "}
-                      <Group sx={{ color: "white" }} />
-                    </span>
+                    <Search />
                   </IconButton>
-                </Link>
-              </Tooltip>
-              <Tooltip title="Notifications">
-                <IconButton
-                  color="inherit"
-                  size="large"
-                  onClick={openNotification}
-                >
-                  <Notifications />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Logout">
-                <IconButton
-                  color="inherit"
-                  size="large"
-                  onClick={logoutHandler}
-                >
-                  <Logout />
-                </IconButton>
-              </Tooltip>
+                </Tooltip>
+                <Tooltip title="New Group">
+                  <IconButton
+                    color="inherit"
+                    size="large"
+                    onClick={openNewGroup}
+                  >
+                    <Add />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Manage Groups">
+                  <Link href="/groups" passHref>
+                    {" "}
+                    <IconButton
+                      color="inherit"
+                      size="large"
+                      sx={{
+                        color: "white",
+                        "&:hover": {
+                          color: "white",
+                        },
+                        textDecoration: "none",
+                        marginTop: "0.5rem",
+                      }}
+                    >
+                      <span style={{ textDecoration: "none" }}>
+                        {" "}
+                        <Group sx={{ color: "white" }} />
+                      </span>
+                    </IconButton>
+                  </Link>
+                </Tooltip>
+                <Tooltip title="Notifications">
+                  <IconButton
+                    color="inherit"
+                    size="large"
+                    onClick={openNotification}
+                  >
+                    <Notifications />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Logout">
+                  <IconButton
+                    color="inherit"
+                    size="large"
+                    onClick={logoutHandler}
+                  >
+                    <Logout />
+                  </IconButton>
+                </Tooltip>
+              </div>
             </Box>
           </Toolbar>
         </AppBar>
