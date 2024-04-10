@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import { v4 as uuid } from "uuid";
 import cors from "cors";
+import {v2 as cloudinary} from "cloudinary";
 
 import userRoute from "./routes/user.js";
 import chatRoute from "./routes/chat.js";
@@ -25,6 +26,11 @@ const port = process.env.PORT || 3000;
 const userSocketIDs = new Map();
 
 connectDB(mongoURI);
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
 // createUsers(10);
 
 const app = express();

@@ -2,7 +2,7 @@ import { compare } from "bcrypt";
 import { User } from "../models/user.js";
 import { Chat } from "../models/chat.js";
 import { Request } from "../models/request.js";
-import { emitEvent, sendToken } from "../utils/features.js";
+import { emitEvent, sendToken, uploadFilesToCloudinary } from "../utils/features.js";
 import { ErrorHandler } from "../utils/utility.js";
 import { cookieOptions } from "../utils/features.js";
 import { NEW_REQUEST, REFETCH_CHATS } from "../constants/events.js";
@@ -15,9 +15,11 @@ const newUser = async (req, res, next) => {
 
   if(!file) return next(new ErrorHandler("Please upload an image"), 400);
 
+  const result = await uploadFilesToCloudinary([file]);
+
   const avatar = {
-    public_id: "asd",
-    url: "asdd",
+    public_id: result[0].public_id,
+    url: result[0].secureUrl,
   };
 
   const user = await User.create({

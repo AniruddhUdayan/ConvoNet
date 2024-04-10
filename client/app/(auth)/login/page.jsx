@@ -17,8 +17,8 @@ import { useFileHandler, useInputValidation, useStrongPassword } from "6pp";
 import { usernameValidator } from "@/utils/validators";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { userNotExists , userExits } from "@/redux/reducers/auth";
-import {toast} from "react-hot-toast";
+import { userNotExists, userExits } from "@/redux/reducers/auth";
+import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
 const page = () => {
@@ -28,16 +28,7 @@ const page = () => {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  useEffect(() => {
-    axios
-      .get(`${server}/user/profile`)
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((err) => {
-        dispatch(userNotExists());
-      });
-  }, [dispatch]);
+
 
   const toggleLogin = () => {
     setIsLogin(!isLogin);
@@ -60,18 +51,39 @@ const page = () => {
         config
       )
       .then((res) => {
-        console.log(res.data , 'reached');
+        console.log(res.data, "reached");
         dispatch(userExits(true));
-        toast.success(res?.data?.message)
-        router.push('/')
+        toast.success(res?.data?.message);
+        router.push("/");
         // window.location.href = "/";
       })
       .catch((err) => {
-       toast.error(err?.response?.data?.message || 'Something Went Wrong' )
+        toast.error(err?.response?.data?.message || "Something Went Wrong");
       });
   };
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("name", name.value);
+    formData.append("userName", username.value);
+    formData.append("password", password.value);
+    formData.append("bio", bio.value);
+    formData.append("avatar", avatar.file);
+
+    const config = {
+      withCredentials: true,
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+
+    try {
+      const { data } = await axios.post(`${server}/user/new`, formData, config);
+      dispatch(userExits(true));
+      toast.success(data.message);
+      router.push("/");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something Went Wrong");
+    }
   };
 
   const name = useInputValidation("");
