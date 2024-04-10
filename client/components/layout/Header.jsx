@@ -22,14 +22,25 @@ import React, { Suspense, useState } from "react";
 import SearchDialog from "../specific/Search";
 import NotificationDialog from "../specific/Notifications";
 import NewGroupDialog from "../specific/NewGroup";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import {useDispatch} from "react-redux";
+import { userNotExists } from "@/redux/reducers/auth";
+import { useRouter } from "next/navigation";
+import { setIsMobile } from "@/redux/reducers/misc";
 
 const Header = () => {
   const [isSearch, setIsSearch] = useState(false);
   const [isNotification, setIsNotification] = useState(false);
   const [isNewGroup, setIsNewGroup] = useState(false);
 
+  const server = process.env.NEXT_PUBLIC_SERVER;
+
+  const dispatch = useDispatch();
+  const router = useRouter();
+
   const handleMobile = () => {
-    console.log("mobile");
+   dispatch(setIsMobile(true));
   };
   const onSearchDialog = () => {
     setIsSearch(!isSearch);
@@ -37,8 +48,16 @@ const Header = () => {
   const openNewGroup = () => {
     setIsNewGroup(!isNewGroup);
   };
-  const logoutHandler = () => {
+  const logoutHandler = async() => {
     console.log("logout");
+   try {
+    const {data} = await axios.get(`${server}/user/logout`, { withCredentials: true });
+    dispatch(userNotExists())
+    toast.success(data?.message);
+    router.push("/login");
+   } catch (error) {
+    toast.error( error?.response?.data?.message || "Error logging out");
+   }
   };
   const openNotification = () => {
     setIsNotification(!isNotification);
