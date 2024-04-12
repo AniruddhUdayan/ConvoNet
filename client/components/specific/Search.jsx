@@ -12,6 +12,8 @@ import React, { useState } from "react";
 import { Search as SearchIcon } from "@mui/icons-material";
 import UserItem from "../shared/UserItem";
 import { sampleUsers } from "@/constants/sampleData";
+import {useSelector , useDispatch} from "react-redux";
+import { setIsSearch } from "@/redux/reducers/misc";
 
 const users = [1,2,3,4,5]
 
@@ -19,13 +21,19 @@ const Search = () => {
   const [users,setUsers] = useState(sampleUsers);
   const search = useInputValidation("");
 
+  const dispatch = useDispatch();
+
+const {isSearch} = useSelector(state => state.misc)
+
   let isLoadingSendFriendRequest = false;
   const addFriendHandler = (id) => {
     console.log(id);
   }
 
+  const searchCloseHandler = () => dispatch(setIsSearch(false))
+
   return (
-    <Dialog open>
+    <Dialog open={isSearch} onClose={searchCloseHandler}>
       <Stack p={"2rem"} direction={"column"} width={"25rem"}>
         <DialogTitle textAlign={"center"}>Find People</DialogTitle>
         <TextField

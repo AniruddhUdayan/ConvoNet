@@ -12,6 +12,7 @@ import { useMyChatsQuery } from "@/redux/api/api";
 import { Skeleton } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { setIsMobile } from "@/redux/reducers/misc";
+import { useErrors } from "@/hooks/hook";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,6 +34,8 @@ export default function RootLayout({ children }) {
   const handleMobileClose = () => {
     dispatch(setIsMobile(false));
   };
+
+  useErrors([{ isError , error}])
 
   return (
     <html lang="en">

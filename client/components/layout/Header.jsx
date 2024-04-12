@@ -24,26 +24,28 @@ import NotificationDialog from "../specific/Notifications";
 import NewGroupDialog from "../specific/NewGroup";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import {useDispatch} from "react-redux";
+import {useDispatch , useSelector} from "react-redux";
 import { userNotExists } from "@/redux/reducers/auth";
 import { useRouter } from "next/navigation";
-import { setIsMobile } from "@/redux/reducers/misc";
+import { setIsMobile , setIsSearch } from "@/redux/reducers/misc";
 
 const Header = () => {
-  const [isSearch, setIsSearch] = useState(false);
   const [isNotification, setIsNotification] = useState(false);
   const [isNewGroup, setIsNewGroup] = useState(false);
 
   const server = process.env.NEXT_PUBLIC_SERVER;
 
+  const { isSearch } = useSelector(state => state.misc)
+
   const dispatch = useDispatch();
   const router = useRouter();
+
 
   const handleMobile = () => {
    dispatch(setIsMobile(true));
   };
   const onSearchDialog = () => {
-    setIsSearch(!isSearch);
+    dispatch(setIsSearch(true))
   };
   const openNewGroup = () => {
     setIsNewGroup(!isNewGroup);
