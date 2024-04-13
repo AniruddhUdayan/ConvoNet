@@ -59,24 +59,32 @@ const logout = async (req, res) => {
 const searchUser = async (req, res) => {
   const { name = "" } = req.query;
 
+  // Fetching chats where the current user is a member and it's not a group chat
   const myChats = await Chat.find({ groupChat: false, members: req.user });
 
-  // get all the users from my chats like friends or people I have chatted with
-  const allUserFromMyChats = myChats.map((chat) => chat.members).flat();
+  // Extract all member IDs from these chats (flattening the array of arrays)
+  const allUserFromMyChats = myChats.map(chat => chat.members).flat();
 
-  const allUsersExceptMeAndFriends = await User.find(
-    { _id: { $nin: allUserFromMyChats } },
-    name ? { name: { $regex: name, $options: "i" } } : {}
-  );
+  // Formulate query for users not in 'allUserFromMyChats' and optionally matching the 'name' regex
+  let query = { _id: { $nin: allUserFromMyChats } };
+  if (name) {
+      query.name = { $regex: new RegExp(name, 'i') };  // Using RegExp for dynamic expressions
+  }
 
+  // Execute the query to find all users except the current user and their chat members
+  const allUsersExceptMeAndFriends = await User.find(query);
+
+  // Map the results to include only relevant data
   const users = allUsersExceptMeAndFriends.map(({ _id, name, avatar }) => ({
-    _id,
-    name,
-    avatar: avatar.url,
+      _id,
+      name,
+      avatar: avatar.url,  // Make sure 'avatar' and 'url' are correctly referenced
   }));
 
+  // Return the results as a JSON response
   return res.status(200).json({ success: true, users });
 };
+
 
 const sendRequest = async (req, res, next) => {
   const { userId } = req.body;

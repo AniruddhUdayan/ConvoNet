@@ -23,6 +23,7 @@ export default function RootLayout({ children }) {
   const dispatch = useDispatch();
 
   const { isMobile } = useSelector((state) => state.misc);
+  const { user } = useSelector((state) => state.auth);
 
   const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
 
@@ -88,7 +89,7 @@ export default function RootLayout({ children }) {
               bgcolor: "rgba(0,0,0,0.85)",
             }}
           >
-            <Profile />
+            <Profile user={user}/>
           </Grid>
         </Grid>
       </body>

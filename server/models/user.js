@@ -3,6 +3,7 @@ import mongoose , { Schema, model  } from "mongoose";
 
 const schema = new Schema({
   name: { type: String, required: true },
+  bio: { type: String, required: true},
   userName: { type: String, required: true, unique: true },
   password: { type: String, required: true , select: false}, // select: false is used to not return password in response
   avatar : {
