@@ -59,7 +59,7 @@ const logout = async (req, res) => {
 const searchUser = async (req, res) => {
   const { name = "" } = req.query;
 
-  // Fetching chats where the current user is a member and it's not a group chat
+  
   const myChats = await Chat.find({ groupChat: false, members: req.user });
 
   // Extract all member IDs from these chats (flattening the array of arrays)
