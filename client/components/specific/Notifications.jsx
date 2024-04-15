@@ -1,6 +1,6 @@
 import { sampleNotifications } from "@/constants/sampleData";
 import { useErrors } from "@/hooks/hook";
-import { useGetNotificationsQuery } from "@/redux/api/api";
+import { useAcceptFriendRequestMutation, useGetNotificationsQuery } from "@/redux/api/api";
 import { setIsNotification } from "@/redux/reducers/misc";
 import {
   Dialog,
@@ -13,6 +13,7 @@ import {
   Skeleton,
 } from "@mui/material";
 import React, { memo } from "react";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 
 const Notifications = () => {
@@ -23,8 +24,20 @@ const Notifications = () => {
 
   const { isLoading, data, error, isError } = useGetNotificationsQuery();
 
-  const friendRequestHandler = ({ _id, accept }) => {
-    console.log(id);
+  const [acceptRequest] = useAcceptFriendRequestMutation();
+
+  const friendRequestHandler = async ({ _id, accept }) => {
+    dispatch(setIsNotification(false));
+    try {
+      const res = await acceptRequest({ requestId: _id, accept });
+      if(res.data?.success){
+        toast.success(res.data.message);
+      }else{
+        toast.error(res?.data?.error || 'Something went wrong');
+      }
+    } catch (error) {
+      toast.error(error?.data?.error || 'Something went wrong');
+    }
   };
 
   useErrors([{ error }]);

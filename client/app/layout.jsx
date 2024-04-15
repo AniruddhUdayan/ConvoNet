@@ -7,6 +7,7 @@ import Loaders from "@/components/layout/Loaders";
 import { Provider } from "react-redux";
 import store from "@/redux/store";
 import { Toaster } from "react-hot-toast";
+import { SocketProvider } from "@/socket";
 
 
 
@@ -20,7 +21,9 @@ export default function RootLayout({ children }) {
         <Provider store={store}>
           <Suspense fallback={<Loaders />}>
             <CssBaseline />
+            <SocketProvider>
             <div onContextMenu={(e) => e.preventDefault()}><Toaster position="bottom-center"/> {children}</div>
+            </SocketProvider>
           </Suspense>
         </Provider>
       </body>

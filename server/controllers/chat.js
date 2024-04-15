@@ -60,17 +60,15 @@ const getMyChats = async (req, res, next) => {
   );
 
   const transformedChats = chats.map(({ _id, name, members, groupChat }) => {
-    // Added missing opening brace here
-
     const otherMember = getOtherMembers(members, req.user);
 
     return {
       _id,
       groupChat,
       avatar: groupChat
-        ? members.slice(0, 3).map(({ avatar }) => avatar.url)
-        : [otherMember.avatar.url],
-      name: groupChat ? name : otherMember.name,
+        ? members.slice(0, 3).map(({ avatar }) => avatar ? avatar.url : '/path/to/default/avatar.jpg')
+        : [otherMember && otherMember.avatar ? otherMember.avatar.url : '/path/to/default/avatar.jpg'],
+      name: groupChat ? name : (otherMember ? otherMember.name : 'Unknown Member'),
       members: members.reduce((prev, curr) => {
         if (curr.id.toString() !== req.user.toString()) {
           prev.push(curr._id);

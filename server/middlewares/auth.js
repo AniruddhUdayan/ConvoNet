@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import {ErrorHandler} from "../utils/utility.js";
+import {User} from "../models/user.js";
+import {TOKEN} from "../constants/config.js";
 
 const isAuthenticated = (req, res, next) => {
   const token = req.cookies["token"];
@@ -27,4 +29,32 @@ const isAdmin = (req, res, next) => {
   next();
 };
 
-export { isAuthenticated , isAdmin };
+
+const socketAuthenticator = async (err, socket, next) => {
+  try {
+    if (err) return next(err);
+
+    const authToken = socket.request.cookies[TOKEN];
+    // console.log("authToken", authToken);
+
+    if (!authToken)
+      return next(new ErrorHandler("Please login to access this route", 401));
+
+    const decodedData = jwt.verify(authToken, process.env.JWT_SECRET);
+// console.log("decodedData", decodedData);
+    const user = await User.findById(decodedData.id);
+
+    if (!user)
+      return next(new ErrorHandler("Please login to access this route", 401));
+
+    socket.user = user;
+
+    return next();
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler("Please login to access this route", 401));
+  }
+};
+
+
+export { isAuthenticated , isAdmin , socketAuthenticator };

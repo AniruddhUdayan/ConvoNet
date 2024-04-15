@@ -16,6 +16,8 @@ import { createUsers } from "./seeders/user.js";
 import { NEW_MESSAGE } from "./constants/events.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
+import { corsOptions } from "./constants/config.js";
+import { socketAuthenticator } from "./middlewares/auth.js";
 
 dotenv.config({
   path: "./.env",
@@ -35,21 +37,28 @@ connectDB(mongoURI);
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {});
+const io = new Server(server, {
+  cors : corsOptions
+});
+
+app.set("io", io);
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: "http://localhost:3001", credentials: true }));
+app.use(cors(corsOptions));
 
 app.use("/user", userRoute);
 app.use("/chat", chatRoute);
 app.use("/admin", adminRoute);
 
+io.use((socket, next) => {
+  cookieParser()(socket.request, socket.request.res, async(err)=>{
+    await socketAuthenticator(err, socket , next)
+  });
+});
+
 io.on("connection", (socket) => {
-  const user = {
-    _id: "asdasd",
-    name: "Ani",
-  };
+  const user = socket.user;
   userSocketIDs.set(user._id.toString(), socket.id);
   console.log("a user connected", socket.id);
   socket.on(NEW_MESSAGE, async ({ chatId, members, messages }) => {
