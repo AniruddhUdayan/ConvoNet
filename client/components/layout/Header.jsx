@@ -27,15 +27,14 @@ import { toast } from "react-hot-toast";
 import {useDispatch , useSelector} from "react-redux";
 import { userNotExists } from "@/redux/reducers/auth";
 import { useRouter } from "next/navigation";
-import { setIsMobile , setIsSearch } from "@/redux/reducers/misc";
+import { setIsMobile , setIsNotification, setIsSearch } from "@/redux/reducers/misc";
 
 const Header = () => {
-  const [isNotification, setIsNotification] = useState(false);
   const [isNewGroup, setIsNewGroup] = useState(false);
 
   const server = process.env.NEXT_PUBLIC_SERVER;
 
-  const { isSearch } = useSelector(state => state.misc)
+  const { isSearch , isNotification } = useSelector(state => state.misc)
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -62,7 +61,7 @@ const Header = () => {
    }
   };
   const openNotification = () => {
-    setIsNotification(!isNotification);
+    dispatch(setIsNotification(true));
   };
   return (
     <>

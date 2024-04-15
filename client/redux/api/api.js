@@ -33,8 +33,8 @@ const api = createApi({
     }),
     getNotifications: builder.query({
       query: () => ({
-        url: `user/notification`,
-        credentials: "include,",
+        url: `user/notifications`,
+        credentials: "include",
       }),
       keepUnusedDataFor: 0,
     }),

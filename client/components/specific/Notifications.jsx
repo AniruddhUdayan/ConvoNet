@@ -1,6 +1,7 @@
 import { sampleNotifications } from "@/constants/sampleData";
 import { useErrors } from "@/hooks/hook";
 import { useGetNotificationsQuery } from "@/redux/api/api";
+import { setIsNotification } from "@/redux/reducers/misc";
 import {
   Dialog,
   Stack,
@@ -12,8 +13,14 @@ import {
   Skeleton,
 } from "@mui/material";
 import React, { memo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const Notifications = () => {
+
+  const dispatch = useDispatch();
+
+  const {isNotification} = useSelector((state) => state.misc);
+
   const { isLoading, data, error, isError } = useGetNotificationsQuery();
 
   const friendRequestHandler = ({ _id, accept }) => {
@@ -22,8 +29,13 @@ const Notifications = () => {
 
   useErrors([{ error }]);
 
+  const closeHandler = () => {
+    dispatch(setIsNotification(false));
+  }
+
+
   return (
-    <Dialog open>
+    <Dialog open={isNotification} onClose={closeHandler}>
       <Stack p={{ xs: "1rem", sm: "2rem" }} maxWidth={"25rem"}>
         <DialogTitle>Notifications</DialogTitle>
         {isLoading ? (
@@ -31,8 +43,8 @@ const Notifications = () => {
         ) : (
           <>
             {" "}
-            {data?.allRequests?.length > 0 ? (
-              data?.allRequests?.map((notification) => (
+            {data?.requests?.length > 0 ? (
+              data?.requests?.map((notification) => (
                 <NotificationItem
                   sender={notification.sender}
                   _id={notification._id}
@@ -74,7 +86,8 @@ const NotificationItem = memo(({ sender, _id, handler }) => {
             width: "100%",
           }}
         >
-          {`${name} sent you a friend request`}
+          {`${name} 
+          friend request`}
         </Typography>
         <Stack
           direction={{
