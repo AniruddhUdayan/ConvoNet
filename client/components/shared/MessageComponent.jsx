@@ -7,6 +7,7 @@ import { memo } from 'react';
 import RenderAttachment from './RenderAttachment';
 
 const MessageComponent = ({message , user}) => {
+  console.log(message , 'message2');
 
     const {sender , content , attachments=[] , createdAt} = message;
 

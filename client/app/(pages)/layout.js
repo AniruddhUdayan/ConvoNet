@@ -77,7 +77,7 @@ export default function RootLayout({ children }) {
               )}
             </Grid>
             <Grid item xs={12} sm={8} md={5} lg={6} height={"100%"}>
-              {children} chatId={chatId}
+              {children} 
             </Grid>
             <Grid
               item
