@@ -10,9 +10,10 @@ import FileMenu from "@/components/dialogs/FileMenu";
 import { getSocket } from "@/socket";
 import { NEW_MESSAGE } from "@/constants/events";
 import { useParams } from "next/navigation";
-import { useChatDetailsQuery } from "@/redux/api/api";
-import { useSocketEvents } from "@/hooks/hook";
+import { useChatDetailsQuery, useGetMessagesQuery } from "@/redux/api/api";
+import { useErrors, useSocketEvents } from "@/hooks/hook";
 import { useSelector } from "react-redux";
+import { useInfiniteScrollTop } from "6pp";
 
 // const user = {
 //   _id: "asdasdad",
@@ -20,6 +21,11 @@ import { useSelector } from "react-redux";
 // };
 
 const Chat = () => {
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [page, setPage] = useState(1);
+  console.log(messages, "messages");
+
   const containerRef = useRef(null);
   const params = useParams();
   const chatId = params.id;
@@ -27,35 +33,52 @@ const Chat = () => {
   const { user } = useSelector((state) => state.auth);
   // console.log(user, "user");
 
-  const chatDetails = useChatDetailsQuery({ chatId , skip : !chatId});
+  const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId });
+  const oldMessagesChunk = useGetMessagesQuery({ chatId, page });
 
   const socket = getSocket();
-  const members = chatDetails?.data?.chat?.members
-
-  const [message, setMessage] = useState("");
-  const [messages , setMessages] = useState([]);
-  console.log(messages , 'messages');
+  const members = chatDetails?.data?.chat?.members;
 
   const submitHandler = (e) => {
     e.preventDefault();
-    if(!message.trim()) return;
-
-   
-
-    socket.emit(NEW_MESSAGE, {chatId, members,  message});
+    if (!message.trim()) return;
+    console.log(
+      `Sending message: ${message} to chatId: ${chatId} with members: ${members}`
+    );
+    socket.emit(NEW_MESSAGE, { chatId, members, message });
     setMessage("");
-  }
+    console.log("Message sent and input cleared");
+  };
 
-  const newMessagesListner = useCallback((data) => {
-    console.log(data , 'data');
-    setMessages((prev) => [...prev, data?.message]);
-  },[])
+  const {data : oldMessages , setData : setOldMessages} = useInfiniteScrollTop(containerRef , oldMessagesChunk.data?.totalPages, page, setPage , oldMessagesChunk.data?.messages);
 
-  const eventHandlers = {[NEW_MESSAGE]: newMessagesListner};
+  const errors = [
+    { isError: chatDetails.isError, error: chatDetails.error },
+    { isError: oldMessagesChunk.isError, error: oldMessagesChunk.error },
+  ];
+console.log(oldMessagesChunk?.data, "oldMessagesChunk");
+  const newMessagesListener = useCallback((data) => {
+    console.log("Received data in newMessagesListener:", data);
+    if (!data.message) {
+      console.error("Data does not have message:", data);
+      return;
+    }
+    setMessages((prev) => [...prev, data.message]);
+  }, []);
+
+  const eventHandlers = { [NEW_MESSAGE]: newMessagesListener };
 
   useSocketEvents(socket, eventHandlers);
+  useErrors(errors);
 
-  return chatDetails.isLoading ? (<Skeleton />) : (
+  // const oldMessages = oldMessagesChunk?.data?.messages || [];
+
+  const allMessages = [...oldMessages, ...messages];
+
+
+  return chatDetails.isLoading ? (
+    <Skeleton />
+  ) : (
     <>
       <Stack
         ref={containerRef}
@@ -69,8 +92,10 @@ const Chat = () => {
           overflowY: "auto",
         }}
       >
-        {messages?.map((message, index) => {
-          <MessageComponent key={index} message={message} user={user} />;
+        {allMessages?.map((message) => {
+          return (
+            <MessageComponent key={message._id} message={message} user={user} />
+          );
         })}
       </Stack>
       <form

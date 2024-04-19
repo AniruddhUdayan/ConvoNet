@@ -22,7 +22,6 @@ export default function Home() {
       .get(`${server}/user/profile`, { withCredentials: true })
       .then((res) => {
        dispatch(userExits(res.data.data));
-       console.log(res, "reached");
       })
       .catch((err) => {
         dispatch(userNotExists());

@@ -13,7 +13,7 @@ import userRoute from "./routes/user.js";
 import chatRoute from "./routes/chat.js";
 import adminRoute from "./routes/admin.js";
 import { createUsers } from "./seeders/user.js";
-import { NEW_MESSAGE } from "./constants/events.js";
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/events.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
 import { corsOptions } from "./constants/config.js";
@@ -78,13 +78,13 @@ io.on("connection", (socket) => {
       sender: user._id,
       chat: chatId,
     };
-
+console.log('emmiting',messageForRealTime , members);
     const usersSocket = getSockets(members);
     io.to(usersSocket).emit(NEW_MESSAGE, {
       chatId,
       message : messageForRealTime,
     });
-    io.to(usersSocket).emit(NEW_MESSAGE, {chatId});
+    io.to(usersSocket).emit(NEW_MESSAGE_ALERT, {chatId});
     await Message.create(messageForDB);
   });
   socket.on("disconnect", () => {

@@ -14,6 +14,7 @@ import { SocketProvider } from "@/socket";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
+  
 
   return (
     <html lang="en">

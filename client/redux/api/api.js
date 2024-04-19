@@ -5,7 +5,7 @@ const server = process.env.NEXT_PUBLIC_SERVER;
 const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl: `${server}/` }),
-  tagTypes: ["Chat"],
+  tagTypes: ["Chat","User","Message"],
 
   endpoints: (builder) => ({
     myChats: builder.query({
@@ -58,6 +58,13 @@ const api = createApi({
       },
       providesTags: ["Chat"],
     }),
+    getMessages: builder.query({
+      query: ({ chatId, page}) => ({
+        url:`chat/messages/${chatId}?page=${page}`,
+        credentials:"include"
+      }),
+      providesTags: ["Message"],
+    }),
   }),
 });
 
@@ -68,5 +75,6 @@ export const {
   useSendFriendRequestMutation,
   useGetNotificationsQuery,
   useAcceptFriendRequestMutation,
-  useChatDetailsQuery
+  useChatDetailsQuery,
+  useGetMessagesQuery
 } = api;
