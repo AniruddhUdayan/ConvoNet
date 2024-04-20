@@ -3,12 +3,13 @@ import { ErrorHandler } from "../utils/utility.js";
 import { Chat } from "../models/chat.js";
 import { User } from "../models/user.js";
 import { Message } from "../models/message.js";
-import { deleteFilesFromCloudinary, emitEvent } from "../utils/features.js";
+import { deleteFilesFromCloudinary, emitEvent, uploadFilesToCloudinary } from "../utils/features.js";
 import {
   ALERT,
   REFETCH_CHATS,
   NEW_ATTACHMENT,
   NEW_MESSAGE_ALERT,
+  NEW_MESSAGE,
 } from "../constants/events.js";
 import { getOtherMembers } from "../lib/helper.js";
 
@@ -276,7 +277,7 @@ const sendAttachments = async (req, res, next) => {
   }
 
   // Upload files here
-  const attachments = [];
+  const attachments = await uploadFilesToCloudinary(files);
 
   const messageForDB = {
     content: "",
@@ -294,7 +295,7 @@ const sendAttachments = async (req, res, next) => {
 
   const message = await Message.create(messageForDB);
 
-  emitEvent(req, NEW_ATTACHMENT, chat.members, {
+  emitEvent(req, NEW_MESSAGE, chat.members, {
     message: messageForRealTime,
     chatId,
   });

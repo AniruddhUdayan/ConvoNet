@@ -17,7 +17,7 @@ const MessageComponent = ({message , user}) => {
 
   return (
     <div style={{
-        alignSelf: sender?._id === user._id ? "flex-end" : "flex-start",
+        alignSelf: sender?._id === user?._id ? "flex-end" : "flex-start",
         backgroundColor:"white",
         color:"black",
         borderRadius:"5px",

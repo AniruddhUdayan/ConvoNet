@@ -4,7 +4,6 @@ import { IconButton, Skeleton, Stack } from "@mui/material";
 import { grayColor, orange } from "@/constants/color";
 import { AttachFile, Send } from "@mui/icons-material";
 import { InputBox } from "@/components/styles/StyledComponents";
-import { sampleMessages } from "@/constants/sampleData";
 import MessageComponent from "@/components/shared/MessageComponent";
 import FileMenu from "@/components/dialogs/FileMenu";
 import { getSocket } from "@/socket";
@@ -12,20 +11,20 @@ import { NEW_MESSAGE } from "@/constants/events";
 import { useParams } from "next/navigation";
 import { useChatDetailsQuery, useGetMessagesQuery } from "@/redux/api/api";
 import { useErrors, useSocketEvents } from "@/hooks/hook";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useInfiniteScrollTop } from "6pp";
+import { setIsFileMenu } from "@/redux/reducers/misc";
 
-// const user = {
-//   _id: "asdasdad",
-//   name: "John Doe",
-// };
 
 const Chat = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
-  console.log(messages, "messages");
+  const [fileMenuAnchor, setFileMenuAnchor] = useState(null);
 
+  
+
+  const dispatch = useDispatch();
   const containerRef = useRef(null);
   const params = useParams();
   const chatId = params.id;
@@ -42,25 +41,30 @@ const Chat = () => {
   const submitHandler = (e) => {
     e.preventDefault();
     if (!message.trim()) return;
-    console.log(
-      `Sending message: ${message} to chatId: ${chatId} with members: ${members}`
-    );
     socket.emit(NEW_MESSAGE, { chatId, members, message });
     setMessage("");
-    console.log("Message sent and input cleared");
   };
 
-  const {data : oldMessages , setData : setOldMessages} = useInfiniteScrollTop(containerRef , oldMessagesChunk.data?.totalPages, page, setPage , oldMessagesChunk.data?.messages);
+  const handleFileOpen = (e) => {
+    dispatch(setIsFileMenu(true));
+    setFileMenuAnchor(e.currentTarget);
+  }
+
+  const { data: oldMessages, setData: setOldMessages } = useInfiniteScrollTop(
+    containerRef,
+    oldMessagesChunk.data?.totalPages,
+    page,
+    setPage,
+    oldMessagesChunk.data?.messages
+  );
 
   const errors = [
     { isError: chatDetails.isError, error: chatDetails.error },
     { isError: oldMessagesChunk.isError, error: oldMessagesChunk.error },
   ];
-console.log(oldMessagesChunk?.data, "oldMessagesChunk");
+
   const newMessagesListener = useCallback((data) => {
-    console.log("Received data in newMessagesListener:", data);
     if (!data.message) {
-      console.error("Data does not have message:", data);
       return;
     }
     setMessages((prev) => [...prev, data.message]);
@@ -74,7 +78,6 @@ console.log(oldMessagesChunk?.data, "oldMessagesChunk");
   // const oldMessages = oldMessagesChunk?.data?.messages || [];
 
   const allMessages = [...oldMessages, ...messages];
-
 
   return chatDetails.isLoading ? (
     <Skeleton />
@@ -117,6 +120,7 @@ console.log(oldMessagesChunk?.data, "oldMessagesChunk");
               left: "1.5rem",
               rotate: "30deg",
             }}
+            onClick={handleFileOpen}
           >
             <AttachFile />
           </IconButton>
@@ -142,7 +146,7 @@ console.log(oldMessagesChunk?.data, "oldMessagesChunk");
           </IconButton>
         </Stack>
       </form>
-      <FileMenu />
+      <FileMenu anchorE1={fileMenuAnchor} chatId={chatId}/>
     </>
   );
 };
