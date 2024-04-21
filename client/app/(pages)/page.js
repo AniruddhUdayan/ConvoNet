@@ -12,21 +12,7 @@ import { useDispatch } from "react-redux";
 // };
 
 export default function Home() {
-  const server = process.env.NEXT_PUBLIC_SERVER;
-
-  const dispatch = useDispatch();
-
-
-  useEffect(() => {
-    axios
-      .get(`${server}/user/profile`, { withCredentials: true })
-      .then((res) => {
-       dispatch(userExits(res.data.data));
-      })
-      .catch((err) => {
-        dispatch(userNotExists());
-      });
-  }, []);
+ 
   return (
     <Box bgcolor={grayColor} height={"100%"}>
       {" "}

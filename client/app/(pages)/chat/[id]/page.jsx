@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { IconButton, Skeleton, Stack } from "@mui/material";
 import { grayColor, orange } from "@/constants/color";
 import { AttachFile, Send } from "@mui/icons-material";
@@ -14,6 +14,7 @@ import { useErrors, useSocketEvents } from "@/hooks/hook";
 import { useDispatch, useSelector } from "react-redux";
 import { useInfiniteScrollTop } from "6pp";
 import { setIsFileMenu } from "@/redux/reducers/misc";
+import { removeNewMessagesAlert } from "@/redux/reducers/chat";
 
 
 const Chat = () => {
@@ -37,6 +38,16 @@ const Chat = () => {
 
   const socket = getSocket();
   const members = chatDetails?.data?.chat?.members;
+
+  useEffect(() => {
+    dispatch(removeNewMessagesAlert(chatId));
+    return () => {
+      setMessages([]);
+      setMessage("");
+      setOldMessages([]);
+      setPage(1);
+    }
+  }, [chatId]);
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -64,11 +75,9 @@ const Chat = () => {
   ];
 
   const newMessagesListener = useCallback((data) => {
-    if (!data.message) {
-      return;
-    }
+ if(data.chatId !== chatId) return;
     setMessages((prev) => [...prev, data.message]);
-  }, []);
+  }, [chatId]);
 
   const eventHandlers = { [NEW_MESSAGE]: newMessagesListener };
 

@@ -11,6 +11,7 @@ import {
 import {
   AppBar,
   Backdrop,
+  Badge,
   Box,
   IconButton,
   Toolbar,
@@ -28,6 +29,7 @@ import {useDispatch , useSelector} from "react-redux";
 import { userNotExists } from "@/redux/reducers/auth";
 import { useRouter } from "next/navigation";
 import { setIsMobile , setIsNotification, setIsSearch } from "@/redux/reducers/misc";
+import { resetNotificationCount } from "@/redux/reducers/chat";
 
 const Header = () => {
   const [isNewGroup, setIsNewGroup] = useState(false);
@@ -35,6 +37,7 @@ const Header = () => {
   const server = process.env.NEXT_PUBLIC_SERVER;
 
   const { isSearch , isNotification } = useSelector(state => state.misc)
+  const {notificationCount} = useSelector(state => state.chat)
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -62,6 +65,7 @@ const Header = () => {
   };
   const openNotification = () => {
     dispatch(setIsNotification(true));
+    dispatch(resetNotificationCount());
   };
   return (
     <>
@@ -92,68 +96,38 @@ const Header = () => {
             />
             <Box>
               {" "}
-              <div>
-                {" "}
-                <Tooltip title="Search">
-                  {" "}
-                  <IconButton
-                    color="inherit"
-                    size="large"
-                    onClick={onSearchDialog}
-                  >
-                    <Search />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="New Group">
-                  <IconButton
-                    color="inherit"
-                    size="large"
-                    onClick={openNewGroup}
-                  >
-                    <Add />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Manage Groups">
-                  <Link href="/groups" passHref>
-                    {" "}
-                    <IconButton
-                      color="inherit"
-                      size="large"
-                      sx={{
-                        color: "white",
-                        "&:hover": {
-                          color: "white",
-                        },
-                        textDecoration: "none",
-                        marginTop: "0.5rem",
-                      }}
-                    >
-                      <span style={{ textDecoration: "none" }}>
-                        {" "}
-                        <Group sx={{ color: "white" }} />
-                      </span>
-                    </IconButton>
-                  </Link>
-                </Tooltip>
-                <Tooltip title="Notifications">
-                  <IconButton
-                    color="inherit"
-                    size="large"
-                    onClick={openNotification}
-                  >
-                    <Notifications />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Logout">
-                  <IconButton
-                    color="inherit"
-                    size="large"
-                    onClick={logoutHandler}
-                  >
-                    <Logout />
-                  </IconButton>
-                </Tooltip>
-              </div>
+              <Box>
+              <IconBtn
+                title={"Search"}
+                icon={<Search />}
+                onClick={onSearchDialog}
+              />
+
+              <IconBtn
+                title={"New Group"}
+                icon={<Add />}
+                onClick={openNewGroup}
+              />
+
+              <IconBtn
+                title={"Manage Groups"}
+                icon={<Group />}
+                // onClick={navigateToGroup}
+              />
+
+              <IconBtn
+                title={"Notifications"}
+                icon={<Notifications />}
+                onClick={openNotification}
+                value={notificationCount}
+              />
+
+              <IconBtn
+                title={"Logout"}
+                icon={<Logout />}
+                onClick={logoutHandler}
+              />
+            </Box>
             </Box>
           </Toolbar>
         </AppBar>
@@ -174,6 +148,22 @@ const Header = () => {
         </Suspense>
       )}
     </>
+  );
+};
+
+const IconBtn = ({ title, icon, onClick, value }) => {
+  return (
+    <Tooltip title={title}>
+      <IconButton color="inherit" size="large" onClick={onClick}>
+        {value ? (
+          <Badge badgeContent={value} color="error">
+            {icon}
+          </Badge>
+        ) : (
+          icon
+        )}
+      </IconButton>
+    </Tooltip>
   );
 };
 
