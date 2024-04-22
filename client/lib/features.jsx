@@ -1,3 +1,4 @@
+'use client'
 import moment from "moment";
 
 const fileFormat = (url) => {
@@ -27,12 +28,15 @@ const getLast7Days = () => {
     return last7Days;
 };
 
+import Cookies from 'js-cookie';
+
 const getOrSaveFromStorage = ({ key, value, get }) => {
-    if (get)
-      return localStorage.getItem(key)
-        ? JSON.parse(localStorage.getItem(key))
-        : null;
-    else localStorage.setItem(key, JSON.stringify(value));
-  };
+  if (get) {
+    const item = Cookies.get(key);  // Use Cookies.get to retrieve the cookie value
+    return item ? JSON.parse(item) : null;  // Parse the item from JSON if it exists
+  } else {
+    Cookies.set(key, JSON.stringify(value), { expires: 7, path: '' });  // Save the stringified value as a cookie, expires in 7 days
+  }
+};
 
 export {fileFormat , transformImage , getLast7Days , getOrSaveFromStorage}

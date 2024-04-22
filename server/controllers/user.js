@@ -19,8 +19,9 @@ const newUser = async (req, res, next) => {
 
   const avatar = {
     public_id: result[0].public_id,
-    url: result[0].secureUrl,
+    url: result[0].url,
   };
+  console.log(avatar);
 
   const user = await User.create({
     name,

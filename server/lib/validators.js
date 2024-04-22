@@ -54,8 +54,8 @@ const getChatDetailsValidator = () => [
 ];
 
 const renameGroupValidator = () => [
-    body("name" , "Please Enter Group Name").notEmpty(),
-    body("id" , "Please Enter Chat ID").notEmpty(),
+    param("id", "Please Enter Chat ID").notEmpty(),
+    body("name", "Please Enter New Name").notEmpty(),
 ];
 
 const deleteChatValidator = () => [

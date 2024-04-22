@@ -28,15 +28,15 @@ import { toast } from "react-hot-toast";
 import {useDispatch , useSelector} from "react-redux";
 import { userNotExists } from "@/redux/reducers/auth";
 import { useRouter } from "next/navigation";
-import { setIsMobile , setIsNotification, setIsSearch } from "@/redux/reducers/misc";
+import { setIsMobile , setIsNewGroup, setIsNotification, setIsSearch } from "@/redux/reducers/misc";
 import { resetNotificationCount } from "@/redux/reducers/chat";
 
 const Header = () => {
-  const [isNewGroup, setIsNewGroup] = useState(false);
+ 
 
   const server = process.env.NEXT_PUBLIC_SERVER;
 
-  const { isSearch , isNotification } = useSelector(state => state.misc)
+  const { isSearch , isNotification , isNewGroup } = useSelector(state => state.misc)
   const {notificationCount} = useSelector(state => state.chat)
 
   const dispatch = useDispatch();
@@ -50,7 +50,10 @@ const Header = () => {
     dispatch(setIsSearch(true))
   };
   const openNewGroup = () => {
-    setIsNewGroup(!isNewGroup);
+    dispatch(setIsNewGroup(true));
+  };
+  const navigateToGroup = () => {
+    router.push("/groups");
   };
   const logoutHandler = async() => {
     console.log("logout");
@@ -112,7 +115,7 @@ const Header = () => {
               <IconBtn
                 title={"Manage Groups"}
                 icon={<Group />}
-                // onClick={navigateToGroup}
+               onClick={navigateToGroup}
               />
 
               <IconBtn

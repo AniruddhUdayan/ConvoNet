@@ -13,7 +13,7 @@ import userRoute from "./routes/user.js";
 import chatRoute from "./routes/chat.js";
 import adminRoute from "./routes/admin.js";
 import { createUsers } from "./seeders/user.js";
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/events.js";
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from "./constants/events.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
 import { corsOptions } from "./constants/config.js";
@@ -60,7 +60,7 @@ io.use((socket, next) => {
 io.on("connection", (socket) => {
   const user = socket.user;
   userSocketIDs.set(user._id.toString(), socket.id);
-  console.log("a user connected", socket.id);
+  // console.log("a user connected", socket.id);
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
     const messageForRealTime = {
       content: message,
@@ -78,7 +78,6 @@ io.on("connection", (socket) => {
       sender: user._id,
       chat: chatId,
     };
-console.log('emmiting',messageForRealTime , members);
     const usersSocket = getSockets(members);
     io.to(usersSocket).emit(NEW_MESSAGE, {
       chatId,
@@ -87,8 +86,16 @@ console.log('emmiting',messageForRealTime , members);
     io.to(usersSocket).emit(NEW_MESSAGE_ALERT, {chatId});
     await Message.create(messageForDB);
   });
+  socket.on(START_TYPING, ({ chatId, members }) => {
+    const usersSocket = getSockets(members);
+    io.to(usersSocket).emit(START_TYPING, { chatId });
+  })
+  socket.on(STOP_TYPING, ({ chatId, members }) => {
+    const usersSocket = getSockets(members);
+    io.to(usersSocket).emit(STOP_TYPING, { chatId });
+  })
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    // console.log("user disconnected");
     userSocketIDs.delete(user._id.toString());
   });
 });

@@ -1,5 +1,5 @@
 import { grayColor, mattBlack } from "@/constants/color";
-import { styled } from "@mui/material";
+import { keyframes, styled , Skeleton } from "@mui/material";
 import Link from "next/link";
 
 export const VisuallyHiddenInput = styled("input")({
@@ -55,3 +55,13 @@ font-size: 1.1rem;
     background-color: rgba(0,0,0,0.8);
 }
 `
+
+const bounceAnimation = keyframes`
+0% { transform: scale(1); }
+50% { transform: scale(1.5); }
+100% { transform: scale(1); }
+`;
+
+export const BouncingSkeleton = styled(Skeleton)(() => ({
+  animation: `${bounceAnimation} 1s infinite`,
+}));

@@ -13,7 +13,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setIsMobile } from "@/redux/reducers/misc";
 import { useErrors, useSocketEvents } from "@/hooks/hook";
 import { getSocket } from "@/socket";
-import { NEW_MESSAGE_ALERT, NEW_REQUEST } from "@/constants/events";
+import { NEW_MESSAGE_ALERT, NEW_REQUEST, REFETCH_CHATS } from "@/constants/events";
 import { useCallback } from "react";
 import { incrementNotification, setNewMessagesAlert } from "@/redux/reducers/chat";
 import axios from "axios";
@@ -48,13 +48,14 @@ export default function RootLayout({ children }) {
 
   const { isMobile } = useSelector((state) => state.misc);
   const { user } = useSelector((state) => state.auth);
-  const {newMessageAlert} = useSelector((state) => state.chat);
+  const {newMessagesAlert} = useSelector((state) => state.chat);
+  
 
   const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
 
   useEffect(() => {
-    getOrSaveFromStorage({key:NEW_MESSAGE_ALERT, value: newMessageAlert});
-  }, [newMessageAlert]);
+    getOrSaveFromStorage({key:NEW_MESSAGE_ALERT, value: newMessagesAlert});
+  }, [newMessagesAlert]);
 
   const handleDeleteChat = (e, chatId, groupChat) => {
     e.preventDefault();
@@ -65,17 +66,21 @@ export default function RootLayout({ children }) {
     dispatch(setIsMobile(false));
   };
 
-  const newMessageAlertHandler = useCallback((data) => {
+  const newMessagesAlertHandler = useCallback((data) => {
     if (data.chatId === chatId) return;
     dispatch(setNewMessagesAlert(data));
   }, [chatId]);
   const newRequestHandler = useCallback(() => {
     dispatch(incrementNotification());
   }, [dispatch]);
+  const refetchListener = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   const eventHandlers = {
-    [NEW_MESSAGE_ALERT]: newMessageAlertHandler,
+    [NEW_MESSAGE_ALERT]: newMessagesAlertHandler,
     [NEW_REQUEST]: newRequestHandler,
+    [REFETCH_CHATS]: refetchListener
   };
 
   useSocketEvents(socket, eventHandlers);
@@ -95,7 +100,7 @@ export default function RootLayout({ children }) {
               chats={data?.message}
               chatId={chatId} //yha bhi chat id params wali dalni hai
               handleDeleteChat={handleDeleteChat}
-              newMessagesAlert={newMessageAlert}
+              newMessagesAlert={newMessagesAlert}
             />
           </Drawer>
         )}
@@ -116,7 +121,7 @@ export default function RootLayout({ children }) {
                 chats={data?.message}
                 chatId={chatId} //yha bhi chat id params wali dalni hai
                 handleDeleteChat={handleDeleteChat}
-                newMessagesAlert={newMessageAlert}
+                newMessagesAlert={newMessagesAlert}
               />
             )}
           </Grid>

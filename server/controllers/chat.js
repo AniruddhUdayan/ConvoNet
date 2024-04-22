@@ -390,7 +390,7 @@ const deleteChat = async (req, res, next) => {
 };
 
 const renameGroup = async (req, res, next) => {
-  const chatId = req.body.id;
+  const chatId = req.params.id;
   const { name } = req.body;
 
   const chat = await Chat.findById(chatId);

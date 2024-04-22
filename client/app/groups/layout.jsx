@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./../globals.css";
 import { CssBaseline } from "@mui/material";
 import { Suspense } from "react";
-import Loaders from "@/components/layout/Loaders";
+import {Loaders} from "@/components/layout/Loaders";
 
 const inter = Inter({ subsets: ["latin"] });
 
