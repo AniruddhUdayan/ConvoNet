@@ -21,6 +21,7 @@ import { useInfiniteScrollTop } from "6pp";
 import { setIsFileMenu } from "@/redux/reducers/misc";
 import { removeNewMessagesAlert } from "@/redux/reducers/chat";
 import { TypingLoader } from "@/components/layout/Loaders";
+import { useRouter } from "next/navigation";
 
 const Chat = () => {
   const [message, setMessage] = useState("");
@@ -30,6 +31,7 @@ const Chat = () => {
   const [typing, setTyping] = useState(false);
   const [userTyping, setUserTyping] = useState(false);
 
+  const router = useRouter()
   const dispatch = useDispatch();
   const params = useParams();
   const chatId = params.id;
@@ -68,6 +70,9 @@ const Chat = () => {
     socket.emit(NEW_MESSAGE, { chatId, members, message });
     setMessage("");
   };
+  useEffect(() => {
+    // if(!chatDetails?.isError) return router.push("/");
+  }, [chatDetails.data]);
 
   const messageOnChange = (e) => {
     setMessage(e.target.value);

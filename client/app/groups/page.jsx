@@ -30,15 +30,21 @@ import React, { Suspense, useEffect, useState } from "react";
 import { memo } from "react";
 import UserItem from "@/components/shared/UserItem";
 import {
+  useAddGroupMembersMutation,
   useChatDetailsQuery,
+  useDeleteChatMutation,
   useMyGroupsQuery,
+  useRemoveGroupMemberMutation,
   useRenameGroupMutation,
 } from "@/redux/api/api";
 import { useAsyncMutation, useErrors } from "@/hooks/hook";
 import { Loaders } from "@/components/layout/Loaders";
-import { useParams, useSearchParams } from "next/navigation";
+import {  useSearchParams } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsAddMember } from "@/redux/reducers/misc";
+import { useRouter } from "next/navigation";
 
-const isAddMember = false;
+
 
 const page = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -49,7 +55,12 @@ const page = () => {
   const [members, setMembers] = useState({});
 
   const chatId = useSearchParams().get("group");
-  
+
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  const { isAddMember } = useSelector((state) => state.misc);
+
 
   const myGroups = useMyGroupsQuery("");
   const groupDetails = useChatDetailsQuery(
@@ -62,7 +73,10 @@ const page = () => {
   const [renameGroup, isLoadingGroupName] = useAsyncMutation(
     useRenameGroupMutation
   );
+  const [removeMember, isLoadingRemoveMember] = useAsyncMutation(useRemoveGroupMemberMutation);
+  const [deleteGroup, isLoadingDeleteGroup] = useAsyncMutation(useDeleteChatMutation);
 
+console.log(groupDetails, "groupDetails") 
   const errors = [
     {
       isError: myGroups.isError,
@@ -89,7 +103,9 @@ const page = () => {
       name: groupNameUpdatedValue,
     });
   };
-  const openAddMemberHandler = () => {};
+  const openAddMemberHandler = () => {
+    dispatch(setIsAddMember(true));
+  };
   const openConfirmDeleteHandler = () => {
     setConfirmDeleteDialog(true);
   };
@@ -97,9 +113,13 @@ const page = () => {
     setConfirmDeleteDialog(false);
   };
   const deleteHandler = () => {
+    deleteGroup("Deleting Group...", chatId);
     closeConfirmDeleteHandler();
+    router.push("/");
   };
-  const removeMemberHandler = (id) => {};
+  const removeMemberHandler = (userId) => {
+    removeMember("Removing Member...", { chatId, userId });
+  };
   useEffect(() => {
     if (groupDetails?.data) {
       setGroupName(groupDetails?.data?.chat?.name);
@@ -294,7 +314,7 @@ const page = () => {
       </Grid>
       {isAddMember && (
         <Suspense fallback={<Backdrop open />}>
-          <AddMemberDialog />
+          <AddMemberDialog chatId={chatId}/>
         </Suspense>
       )}
       {confirmDeleteDialog && (

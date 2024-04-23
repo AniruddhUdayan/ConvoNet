@@ -3,7 +3,11 @@ import { ErrorHandler } from "../utils/utility.js";
 import { Chat } from "../models/chat.js";
 import { User } from "../models/user.js";
 import { Message } from "../models/message.js";
-import { deleteFilesFromCloudinary, emitEvent, uploadFilesToCloudinary } from "../utils/features.js";
+import {
+  deleteFilesFromCloudinary,
+  emitEvent,
+  uploadFilesToCloudinary,
+} from "../utils/features.js";
 import {
   ALERT,
   REFETCH_CHATS,
@@ -67,9 +71,21 @@ const getMyChats = async (req, res, next) => {
       _id,
       groupChat,
       avatar: groupChat
-        ? members.slice(0, 3).map(({ avatar }) => avatar ? avatar.url : '/path/to/default/avatar.jpg')
-        : [otherMember && otherMember.avatar ? otherMember.avatar.url : '/path/to/default/avatar.jpg'],
-      name: groupChat ? name : (otherMember ? otherMember.name : 'Unknown Member'),
+        ? members
+            .slice(0, 3)
+            .map(({ avatar }) =>
+              avatar ? avatar.url : "/path/to/default/avatar.jpg"
+            )
+        : [
+            otherMember && otherMember.avatar
+              ? otherMember.avatar.url
+              : "/path/to/default/avatar.jpg",
+          ],
+      name: groupChat
+        ? name
+        : otherMember
+        ? otherMember.name
+        : "Unknown Member",
       members: members.reduce((prev, curr) => {
         if (curr.id.toString() !== req.user.toString()) {
           prev.push(curr._id);
@@ -187,6 +203,7 @@ const removeMembers = async (req, res, next) => {
       )
     );
   }
+  const allChatMembers = chat.members.map((member) => member.toString());
 
   chat.members = chat.members.filter(
     (member) => member.toString() !== userId.toString()
@@ -198,9 +215,11 @@ const removeMembers = async (req, res, next) => {
     req,
     ALERT,
     chat.members,
-    `${removedUser} has been removed from the group chat`
+   {
+      message: `${removedUser.name} has been removed from the group chat`, chatId
+   }
   );
-  emitEvent(req, REFETCH_CHATS, chat.members);
+  emitEvent(req, REFETCH_CHATS, allChatMembers);
 
   return res.status(200).json({
     success: true,
@@ -246,7 +265,9 @@ const leaveGroup = async (req, res, next) => {
     req,
     ALERT,
     chat.members,
-    `${user.name} member has left the group chat`
+    {
+      message: `${user.name} has left the group chat`, chatId
+    }
   );
 
   return res.status(200).json({
@@ -260,8 +281,10 @@ const sendAttachments = async (req, res, next) => {
 
   const files = req.files || [];
 
-  if(files.length < 1) return next(new ErrorHandler("Please upload files", 400));
-  if(files.length > 5) return next(new ErrorHandler("You can't upload more than 5 files", 400));
+  if (files.length < 1)
+    return next(new ErrorHandler("Please upload files", 400));
+  if (files.length > 5)
+    return next(new ErrorHandler("You can't upload more than 5 files", 400));
 
   const [chat, user] = await Promise.all([
     Chat.findById(chatId),
@@ -269,8 +292,6 @@ const sendAttachments = async (req, res, next) => {
   ]);
 
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
-
-  
 
   if (files.length < 1) {
     return next(new ErrorHandler("Please upload files", 400));
@@ -353,7 +374,7 @@ const deleteChat = async (req, res, next) => {
     );
   }
 
-  if (!chat.groupChat && chat.members.includes(req.user.toString())) {
+  if (!chat.groupChat && !chat.members.includes(req.user.toString())) {
     return next(
       new ErrorHandler("You are not allowed to delete the chat", 403)
     );
@@ -428,28 +449,34 @@ const renameGroup = async (req, res, next) => {
 
 const getMessages = async (req, res, next) => {
   const chatId = req.params.id;
-  const { page = 1} = req.query;
+  const { page = 1 } = req.query;
 
   const limit = 20;
   const skip = (page - 1) * limit;
 
-  const [messages , totalMessagesCount] = await Promise.all([
+  const chat = await Chat.findById(chatId);
+  if (!chat) return next(new ErrorHandler("Chat not found", 404));
+
+  if (!chat.members.includes(req.user.toString()))
+    return next(new ErrorHandler("You are not allowed to view this chat", 403));
+
+  const [messages, totalMessagesCount] = await Promise.all([
     Message.find({ chat: chatId })
-    .sort({ createdAt: -1 })
-    .limit(limit * 1)
-    .skip(skip)
-    .populate("sender", "name")
-    .lean(),
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip(skip)
+      .populate("sender", "name")
+      .lean(),
     Message.countDocuments({ chat: chatId }),
-  ])
+  ]);
 
   const totalPages = Math.ceil(totalMessagesCount / limit);
 
-    res.status(200).json({
-      success: true,
-      messages : messages.reverse(),
-      totalPages,
-    });
+  res.status(200).json({
+    success: true,
+    messages: messages.reverse(),
+    totalPages,
+  });
 };
 
 export {

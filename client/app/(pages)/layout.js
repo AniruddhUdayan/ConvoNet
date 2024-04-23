@@ -10,16 +10,18 @@ import { useParams } from "next/navigation";
 import { useMyChatsQuery } from "@/redux/api/api";
 import { Skeleton } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
-import { setIsMobile } from "@/redux/reducers/misc";
+import { setIsDeleteMenu, setIsMobile, setSelectedDeleteChat } from "@/redux/reducers/misc";
 import { useErrors, useSocketEvents } from "@/hooks/hook";
 import { getSocket } from "@/socket";
 import { NEW_MESSAGE_ALERT, NEW_REQUEST, REFETCH_CHATS } from "@/constants/events";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { incrementNotification, setNewMessagesAlert } from "@/redux/reducers/chat";
 import axios from "axios";
 import { useEffect } from "react";
 import { userExits, userNotExists } from "@/redux/reducers/auth";
 import { getOrSaveFromStorage } from "@/lib/features";
+import { useRouter } from "next/navigation";
+import DeleteChatMenu from "@/components/dialogs/DeleteChatMenu";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -27,6 +29,8 @@ const inter = Inter({ subsets: ["latin"] });
 export default function RootLayout({ children }) {
   const params = useParams();
   const chatId = params.id;
+  const router = useRouter();
+  const deleteMenuAnchor = useRef(null);
 
   const server = process.env.NEXT_PUBLIC_SERVER;
 
@@ -58,7 +62,9 @@ export default function RootLayout({ children }) {
   }, [newMessagesAlert]);
 
   const handleDeleteChat = (e, chatId, groupChat) => {
-    e.preventDefault();
+    dispatch(setIsDeleteMenu(true));
+    dispatch(setSelectedDeleteChat({ chatId, groupChat }));
+    deleteMenuAnchor.current = e.currentTarget;
     console.log("Chat Deleted", chatId, groupChat);
   };
 
@@ -70,11 +76,14 @@ export default function RootLayout({ children }) {
     if (data.chatId === chatId) return;
     dispatch(setNewMessagesAlert(data));
   }, [chatId]);
+
   const newRequestHandler = useCallback(() => {
     dispatch(incrementNotification());
   }, [dispatch]);
+
   const refetchListener = useCallback(() => {
     refetch();
+    router.push("/");
   }, [refetch]);
 
   const eventHandlers = {
@@ -91,6 +100,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         <Header />
+        <DeleteChatMenu dispatch={dispatch} deleteMenuAnchor={deleteMenuAnchor} />
         {isLoading ? (
           <Skeleton />
         ) : (

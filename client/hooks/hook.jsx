@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
+
 const useErrors = (errors = []) => {
   useEffect(() => {
     errors.forEach(({ isError, error, fallback }) => {
@@ -31,6 +32,7 @@ const useAsyncMutation = (mutatationHook) => {
         });
         setData(res.data);
       } else {
+        console.log(res);
         toast.error(res?.error?.data?.message || "Something went wrong", {
           id: toastId,
         });
