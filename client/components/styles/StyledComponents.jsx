@@ -1,3 +1,4 @@
+'use client'
 import { grayColor, mattBlack } from "@/constants/color";
 import { keyframes, styled , Skeleton } from "@mui/material";
 import Link from "next/link";

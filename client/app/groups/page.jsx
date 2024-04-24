@@ -53,6 +53,7 @@ const page = () => {
   const [groupName, setGroupName] = useState("");
   const [groupNameUpdatedValue, setGroupNameUpdatedValue] = useState("");
   const [members, setMembers] = useState({});
+  const [admin, setAdmin] = useState("");
 
   const chatId = useSearchParams().get("group");
 
@@ -119,12 +120,17 @@ console.log(groupDetails, "groupDetails")
   };
   const removeMemberHandler = (userId) => {
     removeMember("Removing Member...", { chatId, userId });
+    console.log(userId, groupDetails?.data?.chat?.creator?._id, "userId");
+    if(userId === groupDetails?.data?.chat?.creator?._id){
+      router.push("/");
+    }
   };
   useEffect(() => {
     if (groupDetails?.data) {
       setGroupName(groupDetails?.data?.chat?.name);
       setGroupNameUpdatedValue(groupDetails?.data?.chat?.name);
       setMembers(groupDetails?.data?.chat?.members);
+      setAdmin(groupDetails?.data?.chat?.creatorName);
     }
 
     return () => {
@@ -132,6 +138,7 @@ console.log(groupDetails, "groupDetails")
       setGroupNameUpdatedValue("");
       setMembers([]);
       setIsEdit(false);
+      setAdmin("");
     };
   }, [groupDetails?.data]);
 
@@ -298,6 +305,7 @@ console.log(groupDetails, "groupDetails")
                 <UserItem
                   user={user}
                   key={user._id}
+                  admin={admin}
                   isAdded
                   styling={{
                     boxShadow: `0 0  0.5rem rgba(0,0,0,0.2)`,

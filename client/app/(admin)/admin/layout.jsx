@@ -16,8 +16,14 @@ import styled from "@emotion/styled";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
+
+
+
+const serverUrl = process.env.NEXT_PUBLIC_SERVER;
 
 const LinkComponent2 = styled(Link)`
   text-decoration: none;
@@ -28,11 +34,37 @@ const LinkComponent2 = styled(Link)`
     color: rgba(0, 0, 0, 0.54);
   }
 `;
+const LinkComponent3 = styled(Typography)`
+  text-decoration: none;
+  border-radius: 2rem;
+  padding: 1rem 2rem;
+  color: black;
+  &:hover {
+    color: rgba(0, 0, 0, 0.54);
+  }
+  `
 
 const SideBar = ({ w = "100%" }) => {
+  const router = useRouter();
   const pathname = usePathname();
 
-  const logoutHandler = () => {}
+  const logoutHandler = async () => {
+    try {
+      const response = await axios.get(`${serverUrl}/admin/logout`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
+      console.log("Logout successful:", response.data);
+      router.push("/admin");
+      // Additional logic to handle successful logout here
+      // For example, you could redirect to the login page or update the global state
+    } catch (error) {
+      console.error("Logout failed:", error.response ? error.response.data : error.message);
+      // Handle errors here, such as showing a notification to the user
+    }
+  }
 
   return (
     <Stack width={w} direction={"column"} p={"3rem"} spacing={"3rem"}>
@@ -56,14 +88,13 @@ const SideBar = ({ w = "100%" }) => {
             </Stack>
           </LinkComponent2>
         ))}
-        <LinkComponent2
-           href='/'
+        <LinkComponent3 onClick={logoutHandler}
           >
             <Stack direction={"row"} alignItems={"center"} spacing={"1rem"}>
              <ExitToApp />
               <Typography>Logout</Typography>
             </Stack>
-          </LinkComponent2>
+          </LinkComponent3>
       </Stack>
     </Stack>
   );

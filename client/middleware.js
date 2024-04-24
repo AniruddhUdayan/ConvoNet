@@ -11,6 +11,7 @@ export default async function middleware(req) {
   const isProtectedRoute =
     pathname.startsWith("/chat/") || pathname === "/" || pathname === "/groups";
     const token = req.cookies.get("token") || ''
+    const adminToken = req.cookies.get("adminToken") || ''
 
   if (isLoginPage && token) {
     const absoluteUrl = new URL("/", req.nextUrl.origin);
@@ -21,11 +22,11 @@ export default async function middleware(req) {
     const absoluteUrl = new URL("/login", req.nextUrl.origin);
     return NextResponse.redirect(absoluteUrl.toString());
   }
-  if (isAdminPage && adminStatus) {
+  if (isAdminPage && adminToken) {
     const absoluteUrl = new URL("/admin/dashboard", req.nextUrl.origin);
     return NextResponse.redirect(absoluteUrl.toString());
   }
-  if (isDashboardPage && !adminStatus) {
+  if (isDashboardPage && !adminToken) {
     const absoluteUrl = new URL("/admin", req.nextUrl.origin);
     return NextResponse.redirect(absoluteUrl.toString());
   }

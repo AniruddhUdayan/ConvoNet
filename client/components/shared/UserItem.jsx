@@ -3,7 +3,14 @@ import { Add, Remove } from "@mui/icons-material";
 import { Avatar, IconButton, ListItem, Stack, Typography } from "@mui/material";
 import React, { memo } from "react";
 
-const UserItem = ({ user, handler, handlerIsLoading, isAdded=false , styling={} }) => {
+const UserItem = ({
+  user,
+  handler,
+  handlerIsLoading,
+  admin,
+  isAdded = false,
+  styling = {},
+}) => {
   const { name, _id, avatar } = user;
   return (
     <ListItem>
@@ -14,7 +21,7 @@ const UserItem = ({ user, handler, handlerIsLoading, isAdded=false , styling={} 
         width={"100%"}
         {...styling}
       >
-        <Avatar src={transformImage(avatar)}/>
+        <Avatar src={transformImage(avatar)} />
         <Typography
           variant="body1"
           sx={{
@@ -29,6 +36,25 @@ const UserItem = ({ user, handler, handlerIsLoading, isAdded=false , styling={} 
         >
           {name}
         </Typography>
+        {admin == name ? (
+          <Typography
+            variant="body2" // Changed from body1 to body2 to make text smaller
+            sx={{
+              flexGrow: 1,
+              display: "-webkit-box",
+              WebkitLineClamp: 1,
+              WebkitBoxOrdinalGroup: "vertical",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              width: "100%",
+              fontStyle: "italic", // Added to make text italic
+              color: "lightgray", // Changed to make text color lighter
+            }}
+          >
+            admin
+          </Typography>
+        ) : null}
+
         <IconButton
           size="small"
           sx={{
@@ -41,7 +67,7 @@ const UserItem = ({ user, handler, handlerIsLoading, isAdded=false , styling={} 
           onClick={() => handler(_id)}
           disabled={handlerIsLoading}
         >
-         {isAdded ? <Remove/> :  <Add />}
+          {isAdded ? <Remove /> : <Add />}
         </IconButton>
       </Stack>
     </ListItem>

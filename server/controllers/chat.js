@@ -331,8 +331,10 @@ const sendAttachments = async (req, res, next) => {
 
 const getChatDetails = async (req, res, next) => {
   if (req.query.populate === "true") {
+    // Assuming the 'creator' field holds a reference to the User model
     const chat = await Chat.findById(req.params.id)
       .populate("members", "name avatar")
+      .populate("creator", "name")  // Populating creator name from User model
       .lean();
 
     if (!chat) return next(new ErrorHandler("Chat not found", 404));
@@ -345,19 +347,34 @@ const getChatDetails = async (req, res, next) => {
       };
     });
 
+    // Adding creatorName to the chat object for response
+    const creatorName = chat.creator ? chat.creator.name : "Unknown";
+
     return res.status(200).json({
       success: true,
-      chat,
+      chat: {
+        ...chat,
+        creatorName,  // Include the creatorName in the response
+      },
     });
   } else {
     const chat = await Chat.findById(req.params.id);
     if (!chat) return next(new ErrorHandler("Chat not found", 404));
+
+    // When not populating members, we still need to fetch and include the creator's name
+    const creator = await User.findById(chat.creator).select("name").lean();
+    const creatorName = creator ? creator.name : "Unknown";
+
     res.status(200).json({
       success: true,
-      chat,
+      chat: {
+        ...chat.toJSON(),
+        creatorName,  // Include the creatorName in the response
+      },
     });
   }
 };
+
 
 const deleteChat = async (req, res, next) => {
   const chatId = req.params.id;
