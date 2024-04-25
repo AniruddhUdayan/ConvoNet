@@ -82,8 +82,8 @@ const getAllChats = async (req, res) => {
           return { _id, name, avatar: avatar.url };
         }),
         creator : {
-            name : creator.name || 'None',
-            avatar : creator.avatar.url || ''
+            name : creator?.name || 'None',
+            avatar : creator?.avatar.url || ''
         },
         totalMembers: members.length,
         totalMessages
@@ -93,7 +93,7 @@ const getAllChats = async (req, res) => {
 
   return res.status(200).json({
     status: "success",
-    chats,
+    chats:transformChats,
   });
 };
 
@@ -103,18 +103,19 @@ const getAllMessages = async (req, res) => {
   const transformedMessages = messages.map(({ _id, sender, chat, content, createdAt , attachments }) => {
     return {
       _id,
-      sender: {
-        _id: sender._id,
-        name: sender.name,
-        avatar: sender.avatar.url,
-      },
-      chat:chat._id,
-      groupChat: chat.groupChat,
+      attachments,
       content,
       createdAt,
-      attachments
+      chat: chat._id,
+      groupChat: chat.groupChat,
+      sender: {
+        _id: sender?._id,
+        name: sender?.name,
+        avatar: sender?.avatar?.url,
+      },
     };
   });
+
 
   return res.status(200).json({
     status: "success",

@@ -1,8 +1,11 @@
 "use client";
+import { useFetchData } from "6pp";
 import AvatarCard from "@/components/shared/AvatarCard";
 import Table from "@/components/shared/Table";
+import { useErrors } from "@/hooks/hook";
+import { transformImage } from "@/lib/features";
 import { Avatar, Stack } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 
 const columns = [{
   field:"id",
@@ -24,6 +27,12 @@ const columns = [{
   headerName:"Name",
   headerClassName:"table-header",
   width:300,
+},
+{
+  field: "groupChat",
+  headerName: "Group",
+  headerClassName: "table-header",
+  width: 100,
 },
 {
   field:"totalMembers",
@@ -60,8 +69,41 @@ const columns = [{
 }
 ]
 
+const server = process.env.NEXT_PUBLIC_SERVER;
+
 const page = () => {
   const [rows, setRows] = useState([]);
+
+  const { loading, data, error } = useFetchData(
+    `${server}/admin/chats`,
+    "GET",
+    "dashboard-chats"
+  );
+
+  console.log(data);
+
+  useErrors([
+    {
+      isError: error,
+      error: error,
+    },
+  ]);
+  useEffect(() => {
+    if (data) {
+      setRows(
+        data?.chats?.map((i) => ({
+          ...i,
+          id: i._id,
+          avatar: i.avatar.map((i) => transformImage(i, 50)),
+          members: i.members.map((i) => transformImage(i.avatar, 50)),
+          creator: {
+            name: i.creator.name,
+            avatar: transformImage(i.creator.avatar, 50),
+          },
+        }))
+      );
+    }
+  }, [data]);
 
   return (
     <>

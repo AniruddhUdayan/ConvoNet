@@ -16,8 +16,27 @@ import {
 import { Box, Container, Paper, Stack, Typography } from "@mui/material";
 import moment from "moment";
 import React from "react";
+import { useFetchData } from "6pp";
+import { useErrors } from "@/hooks/hook";
+
+const server = process.env.NEXT_PUBLIC_SERVER;
 
 const page = () => {
+  const { loading, data, error } = useFetchData(
+    `${server}/admin/stats`,
+    "GET",
+    "dashboard-stats"
+  );
+  const { stats } = data || {};
+  console.log(stats);
+
+  useErrors([
+    {
+      isError: error,
+      error: error,
+    },
+  ]);
+
   const Appbar = (
     <Paper
       elevation={3}
@@ -58,9 +77,13 @@ const page = () => {
       alignItems="center"
       margin={"2rem 0"}
     >
-      <Widget title={"Users"} value={34} Icon={<Person2 />} />
-      <Widget title={"Chats"} value={3} Icon={<Groups />} />
-      <Widget title={"Messages"} value={453} Icon={<Message />} />
+      <Widget title={"Users"} value={stats?.usersCount} Icon={<Person2 />} />
+      <Widget title={"Chats"} value={stats?.totalChatCounts} Icon={<Groups />} />
+      <Widget
+        title={"Messages"}
+        value={stats?.messagesCount}
+        Icon={<Message />}
+      />
     </Stack>
   );
 
@@ -94,7 +117,7 @@ const page = () => {
           <Typography margin={"2rem 0"} variant="h4">
             Last Messages
           </Typography>
-          <LineChart value={[20, 40, 60, 80]} />
+          <LineChart value={stats?.messagesChart || []} />
         </Paper>
         <Paper
           elevation={3}
@@ -112,7 +135,10 @@ const page = () => {
         >
           <DoughnutChart
             labels={["Single Chats", "Group Chats"]}
-            value={[23, 66]}
+            value={[
+              stats?.totalChatCounts - stats?.groupsCount || 0,
+              stats?.groupsCount || 0,
+            ]}
           />
           <Stack
             position={"absolute"}

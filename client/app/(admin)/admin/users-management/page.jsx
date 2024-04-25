@@ -1,7 +1,11 @@
 'use client'
 import Table from '@/components/shared/Table'
+import { useErrors } from '@/hooks/hook'
 import { Avatar } from '@mui/material'
 import React,{useState} from 'react'
+import { useFetchData } from '6pp'
+import { useEffect } from 'react'
+import { transformImage } from '@/lib/features'
 
 const columns = [{
   field:"id",
@@ -44,9 +48,38 @@ const columns = [{
 }
 ]
 
+const server = process.env.NEXT_PUBLIC_SERVER;
+
 const page = () => {
 
   const [rows, setRows] = useState([])
+
+  const { loading, data, error } = useFetchData(
+    `${server}/admin/users`,
+    "GET",
+    "dashboard-users"
+  );
+
+  console.log(data);
+
+  useErrors([
+    {
+      isError: error,
+      error: error,
+    },
+  ]);
+
+  useEffect(() => {
+    if (data) {
+      setRows(
+        data.users.map((i) => ({
+          ...i,
+          id: i._id,
+          avatar: transformImage(i.avatar, 50),
+        }))
+      );
+    }
+  }, [data]);
 
   return (
    <>

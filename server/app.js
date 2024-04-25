@@ -13,7 +13,7 @@ import userRoute from "./routes/user.js";
 import chatRoute from "./routes/chat.js";
 import adminRoute from "./routes/admin.js";
 import { createUsers } from "./seeders/user.js";
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from "./constants/events.js";
+import { CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, NEW_MESSAGE_ALERT, ONLINE_USERS, START_TYPING, STOP_TYPING } from "./constants/events.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
 import { corsOptions } from "./constants/config.js";
@@ -26,6 +26,7 @@ dotenv.config({
 const mongoURI = process.env.MONGO_URI;
 const port = process.env.PORT || 3000;
 const userSocketIDs = new Map();
+const onlineUsers = new Set();
 
 connectDB(mongoURI);
   cloudinary.config({
@@ -94,9 +95,31 @@ io.on("connection", (socket) => {
     const usersSocket = getSockets(members);
     io.to(usersSocket).emit(STOP_TYPING, { chatId });
   })
+  socket.on(CHAT_JOINED, ({userId , members})=>{
+    if (!userId) {
+      console.error("userId is undefined");
+      return; // Exit the function if userId is undefined
+    }
+    onlineUsers.add(userId.toString());
+    // console.log(onlineUsers);
+    const membersSocket = getSockets(members);
+    io.to(membersSocket).emit(ONLINE_USERS, Array.from(onlineUsers));
+  })
+  socket.on(CHAT_LEAVED, ({userId , members})=>{
+    if (!userId) {
+      console.error("userId is undefined");
+      return; // Exit the function if userId is undefined
+    }
+    onlineUsers.delete(userId.toString());
+    const membersSocket = getSockets(members);
+    io.to(membersSocket).emit(ONLINE_USERS, Array.from(onlineUsers));
+
+  })
   socket.on("disconnect", () => {
     // console.log("user disconnected");
     userSocketIDs.delete(user._id.toString());
+    onlineUsers.delete(user._id.toString());
+    socket.broadcast.emit(ONLINE_USERS, Array.from(onlineUsers));
   });
 });
 
