@@ -21,8 +21,6 @@ import { useRouter } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
-
-
 const serverUrl = process.env.NEXT_PUBLIC_SERVER;
 
 const LinkComponent2 = styled(Link)`
@@ -42,7 +40,7 @@ const LinkComponent3 = styled(Typography)`
   &:hover {
     color: rgba(0, 0, 0, 0.54);
   }
-  `
+`;
 
 const SideBar = ({ w = "100%" }) => {
   const router = useRouter();
@@ -52,19 +50,22 @@ const SideBar = ({ w = "100%" }) => {
     try {
       const response = await axios.get(`${serverUrl}/admin/logout`, {
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        withCredentials: true
+        withCredentials: true,
       });
       console.log("Logout successful:", response.data);
       router.push("/admin");
       // Additional logic to handle successful logout here
       // For example, you could redirect to the login page or update the global state
     } catch (error) {
-      console.error("Logout failed:", error.response ? error.response.data : error.message);
+      console.error(
+        "Logout failed:",
+        error.response ? error.response.data : error.message
+      );
       // Handle errors here, such as showing a notification to the user
     }
-  }
+  };
 
   return (
     <Stack width={w} direction={"column"} p={"3rem"} spacing={"3rem"}>
@@ -88,13 +89,12 @@ const SideBar = ({ w = "100%" }) => {
             </Stack>
           </LinkComponent2>
         ))}
-        <LinkComponent3 onClick={logoutHandler}
-          >
-            <Stack direction={"row"} alignItems={"center"} spacing={"1rem"}>
-             <ExitToApp />
-              <Typography>Logout</Typography>
-            </Stack>
-          </LinkComponent3>
+        <LinkComponent3 onClick={logoutHandler}>
+          <Stack direction={"row"} alignItems={"center"} spacing={"1rem"}>
+            <ExitToApp />
+            <Typography>Logout</Typography>
+          </Stack>
+        </LinkComponent3>
       </Stack>
     </Stack>
   );
@@ -111,53 +111,49 @@ export default function RootLayout({ children }) {
   };
 
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Grid container minHeight={"100vh"}>
-          <Box
-            sx={{
-              display: {
-                xs: "block",
-                md: "none",
-              },
-              position: "fixed",
-              right: "1rem",
-              top: "1rem",
-            }}
-          >
-            <IconButton onClick={handleMobile}>
-              {isMobile ? <Close /> : <Menu />}
-            </IconButton>
-          </Box>
-          <Grid
-            item
-            md={4}
-            lg={3}
-            sx={{
-              display: {
-                xs: "none",
-                md: "block",
-              },
-            }}
-          >
-            <SideBar />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            md={8}
-            lg={9}
-            sx={{
-              bgcolor: grayColor,
-            }}
-          >
-            {children}
-          </Grid>
-          <Drawer open={isMobile} onClose={handleClose}>
-            <SideBar w="50vw" />
-          </Drawer>
-        </Grid>
-      </body>
-    </html>
+    <Grid container minHeight={"100vh"}>
+      <Box
+        sx={{
+          display: {
+            xs: "block",
+            md: "none",
+          },
+          position: "fixed",
+          right: "1rem",
+          top: "1rem",
+        }}
+      >
+        <IconButton onClick={handleMobile}>
+          {isMobile ? <Close /> : <Menu />}
+        </IconButton>
+      </Box>
+      <Grid
+        item
+        md={4}
+        lg={3}
+        sx={{
+          display: {
+            xs: "none",
+            md: "block",
+          },
+        }}
+      >
+        <SideBar />
+      </Grid>
+      <Grid
+        item
+        xs={12}
+        md={8}
+        lg={9}
+        sx={{
+          bgcolor: grayColor,
+        }}
+      >
+        {children}
+      </Grid>
+      <Drawer open={isMobile} onClose={handleClose}>
+        <SideBar w="50vw" />
+      </Drawer>
+    </Grid>
   );
 }

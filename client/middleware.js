@@ -12,6 +12,7 @@ export default async function middleware(req) {
     pathname.startsWith("/chat/") || pathname === "/" || pathname === "/groups";
     const token = req.cookies.get("token") || ''
     const adminToken = req.cookies.get("adminToken") || ''
+    console.log(token,'token');
 
   if (isLoginPage && token) {
     const absoluteUrl = new URL("/", req.nextUrl.origin);
