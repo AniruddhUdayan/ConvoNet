@@ -170,12 +170,12 @@ const getMyFriends = async (req, res) => {
     members: req.user,
     groupChat: false,
   }).populate("members", "name avatar");
-  const friends = chats.map((members) => {
-    const otherUser = getOtherMembers(members.members, req.user);
+  const friends = chats.map(({members}) => {
+    const otherUser = getOtherMembers(members, req.user);
     return {
-      _id: otherUser._id,
-      name: otherUser.name,
-      avatar: otherUser.avatar.url,
+      _id: otherUser?._id,
+      name: otherUser?.name,
+      avatar: otherUser?.avatar?.url,
     };
   });
   if (chatId) {
