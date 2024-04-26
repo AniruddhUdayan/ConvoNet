@@ -1,16 +1,18 @@
 import { adminStatus, fetchSessionStatus } from "./utils/session";
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from 'next/headers'
 
 
 
 export default async function middleware(req) {
+  const cookieStore = cookies()
   const { pathname } = req.nextUrl;
   const isLoginPage = pathname === "/login";
   const isAdminPage = pathname === "/admin";
   const isDashboardPage = pathname === "/admin/dashboard";
   const isProtectedRoute =
     pathname.startsWith("/chat/") || pathname === "/" || pathname === "/groups";
-    const token = req.cookies.get("token") || ''
+    const token = cookieStore.get('token')
     const adminToken = req.cookies.get("adminToken") || ''
     console.log(token,'token');
 

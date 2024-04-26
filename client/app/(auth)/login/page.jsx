@@ -20,6 +20,7 @@ import { useDispatch } from "react-redux";
 import { userNotExists, userExits } from "@/redux/reducers/auth";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import Cookie from 'js-cookie';
 
 const page = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -28,6 +29,8 @@ const page = () => {
   const dispatch = useDispatch();
   const router = useRouter();
 
+
+ 
 
 
   const toggleLogin = () => {

@@ -7,6 +7,13 @@ const corsOptions = {
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
+    Headers: true,
+    exposedHeaders: 'Set-Cookie',
+    allowedHeaders: [
+      'Access-Control-Allow-Origin',
+      'Content-Type',
+      'Authorization'
+    ]
   };
   
   const TOKEN = "token";
