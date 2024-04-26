@@ -9,6 +9,8 @@ const cookieOptions = {
   sameSite: 'None',
   httpOnly: false,
   secure: true,
+  domain:'convo-net.vercel.app',
+  path:'/'
 };
 
 const connectDB = (uri) => {
