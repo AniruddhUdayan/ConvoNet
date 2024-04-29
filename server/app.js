@@ -48,9 +48,12 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
 
-app.use("/user", userRoute);
-app.use("/chat", chatRoute);
-app.use("/admin", adminRoute);
+app.use("/api/v1/user", userRoute);
+app.use("/api/v1/chat", chatRoute);
+app.use("/ap1/vi/admin", adminRoute);
+app.use('/api/v1', (req, res) => {
+  res.send("Welcome to ConvoNet API");
+});
 
 io.use((socket, next) => {
   cookieParser()(socket.request, socket.request.res, async(err)=>{
